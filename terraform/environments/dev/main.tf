@@ -17,3 +17,16 @@ module "storage" {
     managed_by  = "terraform"
   }
 }
+
+module "keyvault" {
+  source              = "../../modules/keyvault"
+  key_vault_name      = var.key_vault_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+
+  tags = {
+    environment = "dev"
+    project     = "sp-mobility-data-platform"
+    managed_by  = "terraform"
+  }
+}

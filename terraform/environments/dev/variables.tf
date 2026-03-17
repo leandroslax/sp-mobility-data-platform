@@ -15,3 +15,9 @@ variable "storage_account_name" {
   type        = string
   default     = "stspmobilitydev001"
 }
+
+variable "key_vault_name" {
+  description = "Globally unique Key Vault name"
+  type        = string
+  default     = "kv-sp-mobility-dev-001"
+}

@@ -25,3 +25,15 @@ output "storage_primary_dfs_endpoint" {
 output "storage_containers" {
   value = module.storage.container_names
 }
+
+output "key_vault_id" {
+  value = module.keyvault.key_vault_id
+}
+
+output "key_vault_name" {
+  value = module.keyvault.key_vault_name
+}
+
+output "key_vault_uri" {
+  value = module.keyvault.vault_uri
+}
