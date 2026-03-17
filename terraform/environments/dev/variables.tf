@@ -21,3 +21,9 @@ variable "key_vault_name" {
   type        = string
   default     = "kv-sp-mobility-dev-001"
 }
+
+variable "databricks_workspace_name" {
+  description = "Azure Databricks workspace name"
+  type        = string
+  default     = "dbw-sp-mobility-dev"
+}

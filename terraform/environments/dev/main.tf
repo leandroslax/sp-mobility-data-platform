@@ -30,3 +30,16 @@ module "keyvault" {
     managed_by  = "terraform"
   }
 }
+
+module "databricks" {
+  source              = "../../modules/databricks"
+  workspace_name      = var.databricks_workspace_name
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+
+  tags = {
+    environment = "dev"
+    project     = "sp-mobility-data-platform"
+    managed_by  = "terraform"
+  }
+}

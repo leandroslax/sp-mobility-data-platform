@@ -37,3 +37,15 @@ output "key_vault_name" {
 output "key_vault_uri" {
   value = module.keyvault.vault_uri
 }
+
+output "databricks_workspace_id" {
+  value = module.databricks.workspace_id
+}
+
+output "databricks_workspace_name" {
+  value = module.databricks.workspace_name
+}
+
+output "databricks_workspace_url" {
+  value = module.databricks.workspace_url
+}
