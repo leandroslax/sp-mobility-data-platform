@@ -59,3 +59,9 @@ for k, v in configs.items():
 hc.unset(f"fs.azure.account.key.{account_fqdn}")
 
 dbutils.fs.ls("abfss://landing@stspmobilitydev001.dfs.core.windows.net/")
+
+# COMMAND ----------
+
+scope = "kv-sp-mobility"
+tenant_id = dbutils.secrets.get(scope=scope, key="databricks-sp-tenant-id")
+print(tenant_id)
