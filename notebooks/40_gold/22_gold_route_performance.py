@@ -184,3 +184,9 @@ display(route_performance_validation_df.limit(20))
 route_performance_validation_df.printSchema()
 
 print("Total registros validados:", route_performance_validation_df.count())
+
+# COMMAND ----------
+
+spark.read.format("delta").load(
+"abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility/route_performance"
+).count()
