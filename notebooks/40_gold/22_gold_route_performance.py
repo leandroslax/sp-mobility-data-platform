@@ -1,192 +1,97 @@
 # Databricks notebook source
 # Databricks notebook source
+# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
 
-# COMMAND ----------
 from pyspark.sql import functions as F
 
 # COMMAND ----------
-silver_vehicle_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
 
-gold_route_performance_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility/route_performance"
-
-# COMMAND ----------
-
-# COMMAND ----------
-vehicle_positions_df = spark.read.format("delta").load(silver_vehicle_path)
-routes_df = spark.read.format("delta").load(silver_gtfs_routes_path)
+silver_table = "sp_mobility_silver.sptrans_vehicle_positions"
+gold_table = "sp_mobility_gold.route_performance"
+gold_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance"
 
 # COMMAND ----------
 
 # COMMAND ----------
-mobility_df = vehicle_positions_df.alias("vp").join(
-    routes_df.alias("rt"),
-    F.col("vp.line_code").cast("string") == F.col("rt.route_short_name").cast("string"),
-    "left"
+
+df = spark.table(silver_table)
+
+print("COUNT source df:", df.count())
+df.printSchema()
+
+# COMMAND ----------
+
+# COMMAND ----------
+
+df_clean = (
+    df.filter(F.col("line_code").isNotNull())
+      .filter(F.col("vehicle_prefix").isNotNull())
+      .filter(F.col("event_date").isNotNull())
+      .filter(F.col("event_hour").isNotNull())
 )
 
-# COMMAND ----------
-
-# COMMAND ----------
-mobility_intelligence_df = mobility_df.select(
-    F.col("vp.line_code"),
-    F.col("vp.line_id"),
-    F.col("vp.line_name"),
-    F.col("vp.vehicle_prefix"),
-    F.col("vp.accessible"),
-    F.col("vp.timestamp_api"),
-    F.col("vp.latitude"),
-    F.col("vp.longitude"),
-    F.col("vp.event_date"),
-    F.col("vp.event_hour"),
-    F.col("rt.route_id"),
-    F.col("rt.route_short_name"),
-    F.col("rt.route_long_name"),
-    F.col("rt.route_type")
-)
-
-display(mobility_intelligence_df.limit(20))
+print("COUNT df_clean:", df_clean.count())
 
 # COMMAND ----------
 
 # COMMAND ----------
-route_performance_df = mobility_intelligence_df.groupBy(
-    "event_date",
-    "event_hour",
-    "line_code",
-    "line_id",
-    "line_name",
-    "route_id",
-    "route_short_name",
-    "route_long_name",
-    "route_type"
-).agg(
-    F.countDistinct("vehicle_prefix").alias("active_vehicles"),
-    F.count("*").alias("positions_received"),
-    F.avg("latitude").alias("avg_latitude"),
-    F.avg("longitude").alias("avg_longitude"),
-    F.sum(F.when(F.col("accessible") == True, 1).otherwise(0)).alias("accessible_positions")
-)
 
-# COMMAND ----------
-
-# COMMAND ----------
-route_performance_df = route_performance_df.withColumn(
-    "accessible_pct",
-    F.round(
-        (F.col("accessible_positions") / F.col("positions_received")) * 100,
-        2
+route_performance_df = (
+    df_clean
+    .groupBy("event_date", "event_hour", "line_code")
+    .agg(
+        F.countDistinct("vehicle_prefix").alias("active_vehicles"),
+        F.count("*").alias("total_positions"),
+        F.avg("latitude").alias("avg_latitude"),
+        F.avg("longitude").alias("avg_longitude")
     )
 )
 
+print("COUNT route_performance_df:", route_performance_df.count())
+route_performance_df.printSchema()
 display(route_performance_df.limit(20))
 
 # COMMAND ----------
 
 # COMMAND ----------
+
 route_performance_df.write.format("delta") \
     .mode("overwrite") \
-    .save(gold_route_performance_path)
+    .option("overwriteSchema", "true") \
+    .partitionBy("event_date") \
+    .save(gold_path)
 
 # COMMAND ----------
 
 # COMMAND ----------
-route_performance_validation_df = spark.read.format("delta").load(gold_route_performance_path)
 
-display(route_performance_validation_df.limit(20))
-route_performance_validation_df.printSchema()
+spark.catalog.clearCache()
+spark.sql(f"REFRESH TABLE {gold_table}")
 
-print("Total registros validados:", route_performance_validation_df.count())
+print("Dataset gold/route_performance criado com sucesso")
+print(f"Table refreshed: {gold_table}")
+
+# COMMAND ----------
 
 # COMMAND ----------
 
-# Databricks notebook source
+validation_df = spark.read.format("delta").load(gold_path)
+
+display(validation_df.limit(20))
+validation_df.printSchema()
+print("Total registros validados no path:", validation_df.count())
 
 # COMMAND ----------
-from pyspark.sql import functions as F
 
 # COMMAND ----------
-silver_vehicle_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
 
-gold_route_performance_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility/route_performance"
-
-# COMMAND ----------
-vehicle_positions_df = spark.read.format("delta").load(silver_vehicle_path)
-routes_df = spark.read.format("delta").load(silver_gtfs_routes_path)
-
-# COMMAND ----------
-mobility_df = vehicle_positions_df.alias("vp").join(
-    routes_df.alias("rt"),
-    F.col("vp.line_code").cast("string") == F.col("rt.route_short_name").cast("string"),
-    "left"
+display(
+    dbutils.fs.ls("abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance")
 )
 
 # COMMAND ----------
-mobility_intelligence_df = mobility_df.select(
-    F.col("vp.line_code"),
-    F.col("vp.line_id"),
-    F.col("vp.line_name"),
-    F.col("vp.vehicle_prefix"),
-    F.col("vp.accessible"),
-    F.col("vp.timestamp_api"),
-    F.col("vp.latitude"),
-    F.col("vp.longitude"),
-    F.col("vp.event_date"),
-    F.col("vp.event_hour"),
-    F.col("rt.route_id"),
-    F.col("rt.route_short_name"),
-    F.col("rt.route_long_name"),
-    F.col("rt.route_type")
-)
-
-display(mobility_intelligence_df.limit(20))
-
-# COMMAND ----------
-route_performance_df = mobility_intelligence_df.groupBy(
-    "event_date",
-    "event_hour",
-    "line_code",
-    "line_id",
-    "line_name",
-    "route_id",
-    "route_short_name",
-    "route_long_name",
-    "route_type"
-).agg(
-    F.countDistinct("vehicle_prefix").alias("active_vehicles"),
-    F.count("*").alias("positions_received"),
-    F.avg("latitude").alias("avg_latitude"),
-    F.avg("longitude").alias("avg_longitude"),
-    F.sum(F.when(F.col("accessible") == True, 1).otherwise(0)).alias("accessible_positions")
-)
-
-# COMMAND ----------
-route_performance_df = route_performance_df.withColumn(
-    "accessible_pct",
-    F.round(
-        (F.col("accessible_positions") / F.col("positions_received")) * 100,
-        2
-    )
-)
-
-display(route_performance_df.limit(20))
-
-# COMMAND ----------
-route_performance_df.write.format("delta") \
-    .mode("overwrite") \
-    .save(gold_route_performance_path)
-
-# COMMAND ----------
-route_performance_validation_df = spark.read.format("delta").load(gold_route_performance_path)
-
-display(route_performance_validation_df.limit(20))
-route_performance_validation_df.printSchema()
-
-print("Total registros validados:", route_performance_validation_df.count())
 
 # COMMAND ----------
 
-spark.read.format("delta").load(
-"abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility/route_performance"
-).count()
+print("Total registros via catálogo:", spark.table(gold_table).count())
+spark.table(gold_table).printSchema()
