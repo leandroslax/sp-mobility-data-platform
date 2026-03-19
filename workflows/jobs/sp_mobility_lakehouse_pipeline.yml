@@ -7,7 +7,7 @@ resources:
         - job_cluster_key: sp_mobility_job_cluster
           new_cluster:
             spark_version: 14.3.x-scala2.12
-            node_type_id: Standard_DS3_v2
+            node_type_id: m5.large
             num_workers: 1
 
       tasks:
