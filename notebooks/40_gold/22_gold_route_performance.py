@@ -6,15 +6,14 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
-silver_table = "sp_mobility_silver.sptrans_vehicle_positions"
-gold_table = "sp_mobility_gold.route_performance"
+silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
 gold_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance"
 
 # COMMAND ----------
 
 # COMMAND ----------
 
-df = spark.table(silver_table)
+df = spark.read.format("delta").load(silver_path)
 
 print("COUNT source df:", df.count())
 df.printSchema()
@@ -66,10 +65,9 @@ route_performance_df.write.format("delta") \
 # COMMAND ----------
 
 spark.catalog.clearCache()
-spark.sql(f"REFRESH TABLE {gold_table}")
 
 print("Dataset gold/route_performance criado com sucesso")
-print(f"Table refreshed: {gold_table}")
+print(f"Delta path atualizado: {gold_path}")
 
 # COMMAND ----------
 
@@ -93,5 +91,7 @@ display(
 
 # COMMAND ----------
 
-print("Total registros via catálogo:", spark.table(gold_table).count())
-spark.table(gold_table).printSchema()
+gold_df = spark.read.format("delta").load(gold_path)
+
+print("Total registros via path:", gold_df.count())
+gold_df.printSchema()
