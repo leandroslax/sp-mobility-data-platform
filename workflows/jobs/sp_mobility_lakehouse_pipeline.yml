@@ -13,119 +13,119 @@ resources:
       tasks:
         - task_key: task_00_oauth_connection
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_adls_gen2_oauth_connection
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_adls_gen2_oauth_connection
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_01_create_lakehouse_structure
           depends_on:
             - task_key: task_00_oauth_connection
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/01_create_lakehouse_structure
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/01_create_lakehouse_structure
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_05_governance_catalog
           depends_on:
             - task_key: task_01_create_lakehouse_structure
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/00_governance_catalog_registration
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/00_governance_catalog_registration
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_06_create_delta_tables_bronze
           depends_on:
             - task_key: task_05_governance_catalog
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/01_create_delta_tables_bronze
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/01_create_delta_tables_bronze
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_07_register_silver_tables
           depends_on:
             - task_key: task_06_create_delta_tables_bronze
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/02_register_silver_tables
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/02_register_silver_tables
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_08_register_gold_tables
           depends_on:
             - task_key: task_07_register_silver_tables
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/03_register_gold_tables
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/03_register_gold_tables
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_02_ingest_gtfs_static_data
           depends_on:
             - task_key: task_08_register_gold_tables
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/02_ingest_gtfs_static_data
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/02_ingest_gtfs_static_data
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_09_ingest_sptrans_vehicle_positions
           depends_on:
             - task_key: task_08_register_gold_tables
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/09_ingest_sptrans_vehicle_positions
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/09_ingest_sptrans_vehicle_positions
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_03_bronze_gtfs
           depends_on:
             - task_key: task_02_ingest_gtfs_static_data
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/03_bronze_gtfs
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/03_bronze_gtfs
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_10_bronze_sptrans_vehicle_positions
           depends_on:
             - task_key: task_09_ingest_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/10_bronze_sptrans_vehicle_positions
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/10_bronze_sptrans_vehicle_positions
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_04_silver_gtfs
           depends_on:
             - task_key: task_03_bronze_gtfs
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/04_silver_gtfs
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/04_silver_gtfs
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_11_silver_sptrans_vehicle_positions
           depends_on:
             - task_key: task_10_bronze_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/11_silver_sptrans_vehicle_positions
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/11_silver_sptrans_vehicle_positions
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_12_gold_sptrans_analytics
           depends_on:
             - task_key: task_11_silver_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/12_gold_sptrans_analytics
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/12_gold_sptrans_analytics
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_13_gold_sptrans_mobility_intelligence
           depends_on:
             - task_key: task_11_silver_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/13_gold_sptrans_mobility_intelligence
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/13_gold_sptrans_mobility_intelligence
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_22_gold_route_performance
           depends_on:
             - task_key: task_11_silver_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_23_gold_city_activity
           depends_on:
             - task_key: task_11_silver_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/23_gold_city_activity
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/23_gold_city_activity
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_24_gold_city_heatmap
           depends_on:
             - task_key: task_11_silver_sptrans_vehicle_positions
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_25_gold_mobility_kpis
@@ -133,7 +133,7 @@ resources:
             - task_key: task_22_gold_route_performance
             - task_key: task_23_gold_city_activity
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_35_quality_runner
@@ -144,14 +144,14 @@ resources:
             - task_key: task_23_gold_city_activity
             - task_key: task_25_gold_mobility_kpis
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/35_quality/05_quality_runner
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/35_quality/05_quality_runner
           job_cluster_key: sp_mobility_job_cluster
 
         - task_key: task_45_observability_pipeline
           depends_on:
             - task_key: task_35_quality_runner
           notebook_task:
-            notebook_path: /Repos/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/45_observability/00_pipeline_observability
+            notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/45_observability/00_pipeline_observability
           job_cluster_key: sp_mobility_job_cluster
 
       queue:
