@@ -5,42 +5,40 @@
 
 storage_account = "stspmobilitydev001"
 
-landing_path = f"abfss://landing@{storage_account}.dfs.core.windows.net/gtfs"
-bronze_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/gtfs"
+raw_zip_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/raw/gtfs/cittamobi_gtfs.zip"
+bronze_gtfs_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/gtfs"
 
-zip_path = f"{landing_path}/cittamobi_gtfs.zip"
 local_zip = "/tmp/cittamobi_gtfs.zip"
 extract_dir = "/tmp/gtfs"
-extracted_path = f"{landing_path}/extracted"
 
-print("Landing path:", landing_path)
-print("Bronze path:", bronze_path)
-print("ZIP path:", zip_path)
+print("RAW ZIP path:", raw_zip_path)
+print("Bronze GTFS path:", bronze_gtfs_path)
 print("Local ZIP:", local_zip)
 print("Extract dir:", extract_dir)
-print("Extracted path:", extracted_path)
 
 # COMMAND ----------
 
-dbutils.fs.mkdirs(landing_path)
-
-display(dbutils.fs.ls("abfss://landing@stspmobilitydev001.dfs.core.windows.net/"))
-
-# COMMAND ----------
-
-display(dbutils.fs.ls(landing_path))
+display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/raw/gtfs/"))
+display(dbutils.fs.ls(bronze_gtfs_path))
 
 # COMMAND ----------
 
-dbutils.fs.cp(zip_path, f"file:{local_zip}", True)
+display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/raw/gtfs/"))
+display(dbutils.fs.ls(bronze_gtfs_path))
 
+# COMMAND ----------
+
+dbutils.fs.cp(raw_zip_path, f"file:{local_zip}", True)
 print("Arquivo copiado para:", local_zip)
 
 # COMMAND ----------
 
 import os
 import zipfile
+import shutil
 
+if os.path.exists(extract_dir):
+    shutil.rmtree(extract_dir)
 os.makedirs(extract_dir, exist_ok=True)
 
 with zipfile.ZipFile(local_zip, "r") as zip_ref:
@@ -51,23 +49,13 @@ print(sorted(os.listdir(extract_dir)))
 
 # COMMAND ----------
 
-dbutils.fs.mkdirs(extracted_path)
-
-print("Diretório criado:", extracted_path)
-
-# COMMAND ----------
-
 for file_name in os.listdir(extract_dir):
     local_file = f"{extract_dir}/{file_name}"
-    target_file = f"{extracted_path}/{file_name}"
-
+    target_file = f"{bronze_gtfs_path}/{file_name}"
     dbutils.fs.cp(f"file:{local_file}", target_file, True)
 
-print("Arquivos enviados para landing/extracted")
-
-# COMMAND ----------
-
-display(dbutils.fs.ls(extracted_path))
+print("Arquivos enviados para bronze/gtfs")
+display(dbutils.fs.ls(bronze_gtfs_path))
 
 # COMMAND ----------
 
@@ -75,7 +63,85 @@ routes_df = (
     spark.read
          .option("header", "true")
          .option("inferSchema", "true")
-         .csv(f"{extracted_path}/routes.txt")
+         .csv(f"{bronze_gtfs_path}/routes.txt")
 )
 
 display(routes_df)
+
+# COMMAND ----------
+
+trips_df = (
+    spark.read
+         .option("header", "true")
+         .option("inferSchema", "true")
+         .csv(f"{bronze_gtfs_path}/trips.txt")
+)
+
+display(trips_df)
+
+# COMMAND ----------
+
+stops_df = (
+    spark.read
+         .option("header", "true")
+         .option("inferSchema", "true")
+         .csv(f"{bronze_gtfs_path}/stops.txt")
+)
+
+display(stops_df)
+
+# COMMAND ----------
+
+stop_times_df = (
+    spark.read
+         .option("header", "true")
+         .option("inferSchema", "true")
+         .csv(f"{bronze_gtfs_path}/stop_times.txt")
+)
+
+display(stop_times_df)
+
+# COMMAND ----------
+
+calendar_df = (
+    spark.read
+         .option("header", "true")
+         .option("inferSchema", "true")
+         .csv(f"{bronze_gtfs_path}/calendar.txt")
+)
+
+display(calendar_df)
+
+# COMMAND ----------
+
+shapes_df = (
+    spark.read
+         .option("header", "true")
+         .option("inferSchema", "true")
+         .csv(f"{bronze_gtfs_path}/shapes.txt")
+)
+
+display(shapes_df)
+
+# COMMAND ----------
+
+routes_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_routes")
+trips_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_trips")
+stops_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_stops")
+stop_times_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_stop_times")
+calendar_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_calendar")
+shapes_df.write.format("delta").mode("overwrite").save("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs_shapes")
+
+print("GTFS Bronze Delta gravado com sucesso")
+
+# COMMAND ----------
+
+display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/"))
+
+# COMMAND ----------
+
+spark.sql("SHOW TABLES IN sp_mobility_bronze").show()
+
+# COMMAND ----------
+
+spark.table("sp_mobility_bronze.gtfs_routes").show(5)
