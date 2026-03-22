@@ -1,136 +1,105 @@
-# 🚍 sp-mobility-data-platform
+%PDF-1.4
+%���� ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 4 0 R /F4 5 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/BaseFont /Courier /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+5 0 obj
+<<
+/BaseFont /Symbol /Name /F4 /Subtype /Type1 /Type /Font
+>>
+endobj
+6 0 obj
+<<
+/Contents 11 0 R /MediaBox [ 0 0 612 792 ] /Parent 10 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
 
-Plataforma de engenharia de dados para mobilidade urbana em tempo real, construída com arquitetura **Lakehouse + Medallion** no **Databricks (Azure)**.
+>> 
+  /Type /Page
+>>
+endobj
+7 0 obj
+<<
+/Contents 12 0 R /MediaBox [ 0 0 612 792 ] /Parent 10 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
 
-O projeto simula ingestão e processamento de dados de transporte público (**GTFS + veículos em tempo real**), transformando-os em datasets analíticos para tomada de decisão.
+>> 
+  /Type /Page
+>>
+endobj
+8 0 obj
+<<
+/PageMode /UseNone /Pages 10 0 R /Type /Catalog
+>>
+endobj
+9 0 obj
+<<
+/Author (\(anonymous\)) /CreationDate (D:20260322150730+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260322150730+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (\(unspecified\)) /Title (\(anonymous\)) /Trapped /False
+>>
+endobj
+10 0 obj
+<<
+/Count 2 /Kids [ 6 0 R 7 0 R ] /Type /Pages
+>>
+endobj
+11 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 1527
+>>
+stream
+Gat=*>>OQE&:WeDbf`UiQ^6dfb8Z\(=Fo24%6U^AXk^i/6P9XEl#QRl46*,2K0mk8.SAuNDVoj5fbP"dA!ud>!B:VJoZ@6YL>WXpGMkf,$^\]Wl]G37*0%e,fXMgNL1X.sNmQ#(HU=2)^"?_Pabt#"&'LCMgkh)qK*ZdKekb@1`'XLj7ng7<(,Pn;<H8Ma1BbH[^Tejopjo&L&gNa+ppfV#s"?7]'KDu>H5A[SPup'7#lbmTbFpen1Mht1oXgi$<ER1^BYkZUH4-gB;:,dr%QrS:oSG#*IRPfN3Fkf<."T5=%Y\)mPeigMS4*j2!_g9C6??Gj``r/RT4F(*pg[AlmuBmhNeL.MQ#M<Eek1TK3NRO>mtKc%j$?bShIPD>Xlkb[Nq$8CBP0`:XfLlcl=qQ*2l&tjQo2CcUnBZ)AJ%YQ'P_(q7$_"+[c+`FEP$m>T%`kLKp!V*F-c;pb@qWn,rXdpF^/k!U<]0D4OthTouhu.Vbf<\eN6hfIHMu^'_.Ki'=a?J<-eEF&pN]O6/m#bY.Y,LOmuPL]JH'n[tSmnJQ`"iTt''_ei[+Y5?ee?Hl.gc'HAeV0HQH-g`Xj_9j!c.:9WI8qj$REeXI)8:dXo!]+XD4gJMb#DDdVl?6gDRfRUL=Vd7.7@GR>NlX/uD**s!_c_t.c4A#Vua^S!j7MY1Q[548YVdW<2djR`TUS@F:KAjcAr=K246E^od\Q4EH-If1la_.b&8@;m*GUNGnol?Ralib7e'IU,fjs.(l@q4X'qLgAK1\qNR9^:krXk5/Hcifr4(&A4g8ue.'HV(m\Y*KoLc#i_kr3l%1LFljnSei0IV!5ol3(kr$9IqW%gdK//R@U$fn';NM7cE8[b:@Gn_f#%LHu'OD6P#FWTuR!Zf/XSg&d0S;VG[CQI,%4SBJCa4#Hi(MY`pc]U]NSY.2?i!i*fDL.RLs\g4Fmdg9UZ;;\q?q]%&2]Q("nQ`0;^2id$9Khck:;cE^U[B901`nGZ[%m?o0TCD#P^b@:C1LiaqOqkNj1gg:KI-g,^r%b1JCm/+$JFFr,s&R8bphEK`X#0m#>BPV,6nD0'$K8l_0o,X$0s"kQ)cZg?OGO6+!Mq8;H0%)J(aW''^PfXB4cs/?q#/oNHPM(,lG1;9'G?VJkY5-A48.Z-2=iP-trfSg)=OqmA>*F+>=hbS$hem:<"7dmm'Sll(;f'WeK4q#GKHS0HnuN:p]:<0B]K&+8iDsj#WZBY9..p!aOf_Z=XsAoe@6bUI>\PC%Tk.,A)GP\qX;X_U$[JKY%q`($Q?i8D',$c76hC6^oSc#38TQ<o\4.prE;>gi:buQ[%]9l?29]r5B,B#a[5(%S=T3t@-`uA%iBh9q,W<"=03!e0GEl]La]dU97kp=.Cai"k#FcY!,GDDP\N(42U]"B<f]9s6L.8mK3VPfg>J/M&Jh(n(8OLs_\J@b(]ujZaHLjREF*I6MjU"&>c0k&hbY`oB)2,XD5EgSF+ZpU\:mK`RG7sQ^Z2:-Dc.@2fMXAIU*01"#CrEq3~>endstream
+endobj
+12 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 266
+>>
+stream
+Gar?,Z#7E4&;GBn`BVcXd5VGc\ItH8O?BhYnKf$k^1*Nn5NgB;+_8]-TE"ADc5MBf4n!4f4q0]i1is&Q6.`.UAriK[(T%.pbna$YOg$l/G;n83G;#t`H`:'jdgs2/<Og51=^G_5@Q3g2q?4f6i\UO*[E2kd;I)=aFiA;&MESqB:#>$%Z];6b&<G@f4jf@"2bLZLM'Z=8kdY2#G_8#o]OO7ZedhE.%pjKaU?@A2ZnZ&+,Y[S&j*gUHan1@T=e#9e"&Lq$F]G7~>endstream
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000061 00000 n 
+0000000122 00000 n 
+0000000229 00000 n 
+0000000341 00000 n 
+0000000446 00000 n 
+0000000523 00000 n 
+0000000718 00000 n 
+0000000913 00000 n 
+0000000982 00000 n 
+0000001262 00000 n 
+0000001328 00000 n 
+0000002947 00000 n 
+trailer
+<<
+/ID 
+[<3e046876a3ea66f2cd1c04719c01b909><3e046876a3ea66f2cd1c04719c01b909>]
+% ReportLab generated PDF document -- digest (opensource)
 
----
-
-## 🧠 Arquitetura
-
-- **Cloud:** Azure  
-- **Storage:** ADLS Gen2  
-- **Processamento:** Databricks (Apache Spark)  
-- **Orquestração:** Databricks Jobs  
-- **Formato:** Delta Lake  
-- **Arquitetura:** Medallion (Bronze, Silver, Gold)
-
----
-
-## 🔄 Pipeline de Dados
-
-```
-Ingestion → Bronze → Silver → Gold → Consumption
-```
-
----
-
-## 📥 Ingestion
-
-- Coleta de dados **GTFS (static)**
-- Ingestão de dados em tempo real (**SPTrans - veículos**)
-- Escrita inicial na camada **Bronze (raw)**
-
----
-
-## 🥉 Bronze (Raw Layer)
-
-- Dados brutos, sem transformação
-- Versionamento por data (`ingestion_date`)
-- Histórico completo dos dados
-
----
-
-## 🥈 Silver (Trusted Layer)
-
-- Limpeza e padronização
-- Tratamento de nulos e inconsistências
-- Enriquecimento e joins
-- Estrutura pronta para análise
-
----
-
-## 🥇 Gold (Business Layer)
-
-- Tabelas analíticas otimizadas para consumo
-- KPIs e métricas de mobilidade urbana
-
-### Exemplos de tabelas:
-- mobility_kpis  
-- route_performance  
-- city_heatmap  
-- mobility_intelligence  
-
----
-
-## ⚙️ Orquestração
-
-Pipeline organizado em **Databricks Jobs** com dependências entre tarefas:
-
-### Setup
-- OAuth ADLS
-- Criação do Lakehouse
-
-### Governance
-- Criação de tabelas Delta
-- Registro no catálogo
-
-### Ingestion
-- GTFS Static
-- Vehicle Positions (streaming)
-
-### Transformações
-- Bronze → Silver
-- Silver → Gold
-
----
-
-## 🧪 Boas Práticas Aplicadas
-
-- ✔️ Arquitetura Medallion  
-- ✔️ Versionamento por data  
-- ✔️ Processamento incremental  
-- ✔️ Uso de Delta Lake  
-- ✔️ Separação por camadas  
-- ✔️ Orquestração com dependência de tasks  
-- ✔️ Governança de dados  
-- ✔️ Estrutura escalável  
-
----
-
-## 📊 Casos de Uso
-
-- Monitoramento de transporte público  
-- Análise de performance de rotas  
-- Heatmap de mobilidade urbana  
-- KPIs operacionais em tempo real  
-
----
-
-## 🚀 Próximos Passos
-
-- 🔄 Implementar CDC / ingest incremental avançado  
-- 📡 Evoluir streaming com Structured Streaming  
-- 📊 Criar dashboards (Power BI / Databricks SQL)  
-- 🧪 Adicionar testes de qualidade (Great Expectations / dbt)  
-- 🧬 Implementar data lineage  
-
----
-
-## 👨‍💻 Autor
-
-**Leandro Santos**  
-Data Engineer  
-
-Projetos relacionados:
-- UrbanFlow  
-- Fraud Detection Platform  
-
----
-
-## 🔥 Diferenciais do Projeto
-
-- Simulação de ambiente real de mobilidade urbana  
-- Integração batch + streaming  
-- Arquitetura escalável pronta para produção  
-- Foco em engenharia de dados moderna  
+/Info 9 0 R
+/Root 8 0 R
+/Size 13
+>>
+startxref
+3304
+%%EOF
