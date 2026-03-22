@@ -2,6 +2,8 @@
 
 # Databricks notebook source
 
+# Databricks notebook source
+
 scope = "kv-sp-mobility"
 
 client_id = dbutils.secrets.get(scope=scope, key="databricks-sp-client-id")
