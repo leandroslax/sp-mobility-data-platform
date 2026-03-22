@@ -2,6 +2,10 @@
 
 # COMMAND ----------
 
+print("🚀 Initializing Lakehouse structure...")
+
+# COMMAND ----------
+
 storage_account = "stspmobilitydev001"
 
 landing = f"abfss://landing@{storage_account}.dfs.core.windows.net/"
@@ -42,11 +46,28 @@ paths = [
     checkpoint + "schema/"
 ]
 
-for p in paths:
-    dbutils.fs.mkdirs(p)
+# COMMAND ----------
 
-print("Lakehouse structure created successfully")
+print("📁 Creating directories...")
+
+for p in paths:
+    try:
+        dbutils.fs.mkdirs(p)
+        print(f"✅ Created: {p}")
+    except Exception as e:
+        print(f"❌ Error creating {p}: {e}")
 
 # COMMAND ----------
 
-dbutils.fs.ls("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/")
+print("📂 Listing bronze container...")
+
+try:
+    files = dbutils.fs.ls(bronze)
+    for f in files:
+        print(f.path)
+except Exception as e:
+    print(f"❌ Error listing bronze: {e}")
+
+# COMMAND ----------
+
+print("🎯 Lakehouse structure created successfully!")
