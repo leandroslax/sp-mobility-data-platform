@@ -3,7 +3,7 @@
 
 # COMMAND ----------
 
-print("🥉 Starting Bronze GTFS processing...")
+print("🥉 Starting Bronze layer (dataset-oriented)...")
 
 # COMMAND ----------
 
@@ -11,43 +11,30 @@ spark.conf.set("spark.sql.shuffle.partitions", "8")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import input_file_name
-
-# Paths
 storage_account = "stspmobilitydev001"
 container = "bronze"
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-raw_path = f"{base_path}/gtfs/extracted"
-bronze_path = f"{base_path}/gtfs/bronze"
+delta_base = f"{base_path}/gtfs/delta"
+bronze_base = f"{base_path}/gtfs/bronze"
 
 # COMMAND ----------
 
-print("📂 Reading extracted files...")
+datasets = ["trips", "stops", "routes", "stop_times"]
 
-df = spark.read \
-    .option("header", True) \
-    .option("inferSchema", False) \
-    .csv(f"{raw_path}/*.txt") \
-    .withColumn("source_file", input_file_name())
+for ds in datasets:
+    print(f"📂 Processing {ds}...")
 
-# COMMAND ----------
+    df = spark.read.format("delta").load(f"{delta_base}/{ds}")
 
-print("⚙️ Repartitioning...")
+    df = df.repartition(4)
 
-df = df.repartition(8)
-
-# COMMAND ----------
-
-print("📊 Writing Bronze layer (partitioned by file)...")
-
-df.write \
-    .format("delta") \
-    .mode("append") \
-    .partitionBy("source_file") \
-    .save(bronze_path)
+    df.write \
+        .format("delta") \
+        .mode("overwrite") \
+        .save(f"{bronze_base}/{ds}")
 
 # COMMAND ----------
 
-print("🎯 Bronze layer completed!")
+print("🎯 Bronze completed!")

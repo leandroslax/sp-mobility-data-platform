@@ -3,7 +3,7 @@
 
 # COMMAND ----------
 
-print("🥇 Starting Gold Mobility Metrics...")
+print("🥇 Starting Gold layer (analytics)...")
 
 # COMMAND ----------
 
@@ -11,60 +11,45 @@ spark.conf.set("spark.sql.shuffle.partitions", "8")
 
 # COMMAND ----------
 
-from pyspark.sql.functions import count, countDistinct
+from pyspark.sql.functions import countDistinct
 
-# Paths
 storage_account = "stspmobilitydev001"
 container = "bronze"
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-silver_path = f"{base_path}/gtfs/silver"
-gold_path = f"{base_path}/gtfs/gold"
+silver_base = f"{base_path}/gtfs/silver"
+gold_base = f"{base_path}/gtfs/gold"
 
 # COMMAND ----------
 
-print("📂 Reading Silver data...")
-
-trips = spark.read.format("delta").load(f"{silver_path}/trips")
-stops = spark.read.format("delta").load(f"{silver_path}/stops")
-routes = spark.read.format("delta").load(f"{silver_path}/routes")
+trips = spark.read.format("delta").load(f"{silver_base}/trips")
+routes = spark.read.format("delta").load(f"{silver_base}/routes")
 
 # COMMAND ----------
 
-print("📊 Calculating KPIs...")
+print("📊 Joining trips + routes...")
 
-kpis = trips.agg(
+df_join = trips.join(routes, "route_id", "left")
+
+# COMMAND ----------
+
+print("📈 KPIs...")
+
+kpis = df_join.agg(
     countDistinct("route_id").alias("total_routes"),
     countDistinct("trip_id").alias("total_trips")
 )
 
 # COMMAND ----------
 
-print("📈 Trips per route...")
+print("💾 Writing Gold...")
 
-trips_per_route = trips.groupBy("route_id").agg(
-    countDistinct("trip_id").alias("trips_count")
-)
-
-# COMMAND ----------
-
-print("🛑 Stops per route...")
-
-stops_per_route = stops.groupBy("stop_id").agg(
-    count("*").alias("stop_usage")
-)
+kpis.write \
+    .format("delta") \
+    .mode("overwrite") \
+    .save(f"{gold_base}/kpis")
 
 # COMMAND ----------
 
-print("💾 Writing Gold tables...")
-
-kpis.write.format("delta").mode("overwrite").save(f"{gold_path}/kpis")
-
-trips_per_route.write.format("delta").mode("overwrite").save(f"{gold_path}/trips_per_route")
-
-stops_per_route.write.format("delta").mode("overwrite").save(f"{gold_path}/stops_per_route")
-
-# COMMAND ----------
-
-print("🎯 Gold layer completed!")
+print("🎯 Gold completed!")
