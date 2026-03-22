@@ -1,4 +1,3 @@
-# MAGIC %run ./00_adls_gen2_oauth_connection
 
 storage_account = "stspmobilitydev001"
 
