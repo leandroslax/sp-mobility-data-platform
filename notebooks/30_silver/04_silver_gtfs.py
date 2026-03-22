@@ -1,73 +1,72 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/00_config
 
 # COMMAND ----------
-%run ../00_setup/00_config
+
+print("🥈 Starting Silver GTFS processing...")
 
 # COMMAND ----------
-print("🚀 Starting Silver GTFS processing...")
+
+spark.conf.set("spark.sql.shuffle.partitions", "8")
 
 # COMMAND ----------
+
 from pyspark.sql.functions import col
 
 # Paths
-storage_account = account_name
-container = container_bronze
+storage_account = "stspmobilitydev001"
+container = "bronze"
 
-base_path = f"abfss://{container}@{account_fqdn}"
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
 bronze_path = f"{base_path}/gtfs/bronze"
 silver_path = f"{base_path}/gtfs/silver"
 
 # COMMAND ----------
-print("📥 Reading Bronze tables...")
 
-stops = spark.read.format("delta").load(f"{bronze_path}/stops")
-routes = spark.read.format("delta").load(f"{bronze_path}/routes")
-trips = spark.read.format("delta").load(f"{bronze_path}/trips")
-stop_times = spark.read.format("delta").load(f"{bronze_path}/stop_times")
+print("📂 Reading Bronze data...")
+
+df = spark.read.format("delta").load(bronze_path)
 
 # COMMAND ----------
-print("🧹 Cleaning & casting...")
 
-stops = stops \
-    .withColumn("stop_lat", col("stop_lat").cast("double")) \
-    .withColumn("stop_lon", col("stop_lon").cast("double"))
+print("🧹 Basic cleaning...")
 
-stop_times = stop_times \
-    .withColumn("stop_sequence", col("stop_sequence").cast("int"))
+df_clean = df.dropDuplicates()
 
 # COMMAND ----------
-print("🔗 Optimizing joins...")
 
-# Broadcast small tables (performance boost)
-from pyspark.sql.functions import broadcast
+print("🚍 Processing trips...")
 
-routes = broadcast(routes)
-stops = broadcast(stops)
+df_trips = df_clean.filter(col("source_file").contains("trips.txt"))
 
-# COMMAND ----------
-print("⚙️ Building enriched dataset...")
-
-gtfs_enriched = stop_times \
-    .join(trips, "trip_id", "left") \
-    .join(routes, "route_id", "left") \
-    .join(stops, "stop_id", "left")
-
-# COMMAND ----------
-print("💾 Writing Silver tables...")
-
-stops.write.mode("overwrite").format("delta").save(f"{silver_path}/stops")
-routes.write.mode("overwrite").format("delta").save(f"{silver_path}/routes")
-trips.write.mode("overwrite").format("delta").save(f"{silver_path}/trips")
-stop_times.write.mode("overwrite").format("delta").save(f"{silver_path}/stop_times")
-
-# COMMAND ----------
-print("💾 Writing enriched dataset...")
-
-gtfs_enriched.write \
-    .mode("overwrite") \
+df_trips.write \
     .format("delta") \
-    .save(f"{silver_path}/gtfs_enriched")
+    .mode("overwrite") \
+    .save(f"{silver_path}/trips")
 
 # COMMAND ----------
-print("🎯 Silver GTFS completed!")
+
+print("🛑 Processing stops...")
+
+df_stops = df_clean.filter(col("source_file").contains("stops.txt"))
+
+df_stops.write \
+    .format("delta") \
+    .mode("overwrite") \
+    .save(f"{silver_path}/stops")
+
+# COMMAND ----------
+
+print("🗺️ Processing routes...")
+
+df_routes = df_clean.filter(col("source_file").contains("routes.txt"))
+
+df_routes.write \
+    .format("delta") \
+    .mode("overwrite") \
+    .save(f"{silver_path}/routes")
+
+# COMMAND ----------
+
+print("🎯 Silver layer completed!")
