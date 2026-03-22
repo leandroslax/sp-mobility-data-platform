@@ -1,7 +1,7 @@
 # Databricks notebook source
+# Databricks notebook source
+
 # COMMAND ----------
-
-
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 

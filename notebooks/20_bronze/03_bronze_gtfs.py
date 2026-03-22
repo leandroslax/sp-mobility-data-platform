@@ -1,7 +1,7 @@
 # Databricks notebook source
+# Databricks notebook source
+
 # COMMAND ----------
-
-
 
 
 # COMMAND ----------
@@ -75,4 +75,5 @@ shapes_df = (
 
 
 # COMMAND ----------
+
 

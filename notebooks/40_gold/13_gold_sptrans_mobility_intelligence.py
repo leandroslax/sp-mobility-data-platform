@@ -1,7 +1,7 @@
 # Databricks notebook source
+# Databricks notebook source
+
 # COMMAND ----------
-
-
 bronze_gtfs_routes_path = "abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs/gtfs_routes"
 silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
 
