@@ -1,0 +1,145 @@
+# Databricks notebook source
+# COMMAND ----------
+
+
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 0,
+   "metadata": {
+    "application/vnd.databricks.v1+cell": {
+     "cellMetadata": {
+      "byteLimit": 2048000,
+      "rowLimit": 10000
+     },
+     "inputWidgets": {},
+     "nuid": "b9015a68-c2bf-4cc6-813d-e72bd739502c",
+     "showTitle": false,
+     "tableResultSettingsMap": {},
+     "title": ""
+    }
+   },
+   "outputs": [],
+   "source": [
+    "\n",
+    "\n",
+    "from pyspark.sql import functions as F\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "gold_city_activity_table = \"sp_mobility_gold.city_activity\"\n",
+    "gold_route_performance_table = \"sp_mobility_gold.route_performance\"\n",
+    "gold_mobility_kpis_table = \"sp_mobility_gold.mobility_kpis\"\n",
+    "\n",
+    "gold_mobility_kpis_path = \"abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility_kpis\"\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "city_activity_df = spark.table(gold_city_activity_table)\n",
+    "route_performance_df = spark.table(gold_route_performance_table)\n",
+    "\n",
+    "print(\"COUNT city_activity_df:\", city_activity_df.count())\n",
+    "print(\"COUNT route_performance_df:\", route_performance_df.count())\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "vehicles_per_line_df = (\n",
+    "    route_performance_df\n",
+    "    .groupBy(\"event_date\", \"event_hour\")\n",
+    "    .agg(\n",
+    "        F.avg(\"active_vehicles\").alias(\"avg_vehicles_per_line\"),\n",
+    "        F.max(\"active_vehicles\").alias(\"max_vehicles_in_line\"),\n",
+    "        F.sum(\"active_vehicles\").alias(\"sum_active_vehicles_lines\")\n",
+    "    )\n",
+    ")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "mobility_kpis_df = (\n",
+    "    city_activity_df.alias(\"ca\")\n",
+    "    .join(\n",
+    "        vehicles_per_line_df.alias(\"vl\"),\n",
+    "        on=[\"event_date\", \"event_hour\"],\n",
+    "        how=\"left\"\n",
+    "    )\n",
+    "    .select(\n",
+    "        F.col(\"ca.event_date\"),\n",
+    "        F.col(\"ca.event_hour\"),\n",
+    "        F.col(\"ca.active_lines\"),\n",
+    "        F.col(\"ca.active_vehicles\").alias(\"total_vehicles\"),\n",
+    "        F.col(\"ca.total_positions\"),\n",
+    "        F.col(\"ca.accessible_positions\"),\n",
+    "        F.col(\"ca.accessibility_pct\"),\n",
+    "        F.round(F.col(\"vl.avg_vehicles_per_line\"), 2).alias(\"avg_vehicles_per_line\"),\n",
+    "        F.col(\"vl.max_vehicles_in_line\"),\n",
+    "        F.col(\"vl.sum_active_vehicles_lines\")\n",
+    "    )\n",
+    ")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "print(\"COUNT mobility_kpis_df:\", mobility_kpis_df.count())\n",
+    "mobility_kpis_df.printSchema()\n",
+    "display(mobility_kpis_df.limit(20))\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "mobility_kpis_df.write.format(\"delta\") \\\n",
+    "    .mode(\"overwrite\") \\\n",
+    "    .option(\"overwriteSchema\", \"true\") \\\n",
+    "    .partitionBy(\"event_date\") \\\n",
+    "    .save(gold_mobility_kpis_path)\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "spark.catalog.clearCache()\n",
+    "spark.sql(f\"REFRESH TABLE {gold_mobility_kpis_table}\")\n",
+    "\n",
+    "print(\"Dataset gold/mobility_kpis criado com sucesso\")\n",
+    "print(f\"Table refreshed: {gold_mobility_kpis_table}\")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "validation_df = spark.read.format(\"delta\").load(gold_mobility_kpis_path)\n",
+    "\n",
+    "display(validation_df.limit(20))\n",
+    "validation_df.printSchema()\n",
+    "print(\"Total registros validados no path:\", validation_df.count())\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "display(\n",
+    "    dbutils.fs.ls(\"abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility_kpis\")\n",
+    ")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "\n",
+    "print(\"Total registros via catálogo:\", spark.table(gold_mobility_kpis_table).count())\n",
+    "spark.table(gold_mobility_kpis_table).printSchema()"
+   ]
+  }
+ ],
+ "metadata": {
+  "application/vnd.databricks.v1+notebook": {
+   "computePreferences": null,
+   "dashboards": [],
+   "environmentMetadata": {
+    "base_environment": "",
+    "environment_version": "5"
+   },
+   "inputWidgetPreferences": null,
+   "language": "python",
+   "notebookMetadata": {
+    "pythonIndentUnit": 4
+   },
+   "notebookName": "25_gold_mobility_kpis",
+   "widgets": {}
+  },
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
