@@ -1,13 +1,13 @@
+# COMMAND ----------
+%run ../00_setup/00_config
+# COMMAND ----------
+%run ../00_setup/01_adls_gen2_oauth_connection
+
 # Databricks notebook source
 
 # COMMAND ----------
 
-storage_account = "stspmobilitydev001"
 
-bronze_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/gtfs"
-silver_path = f"abfss://silver@{storage_account}.dfs.core.windows.net/gtfs"
-gold_geo_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_geo"
-gold_map_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_map"
 
 print("Bronze:", bronze_path)
 print("Silver:", silver_path)

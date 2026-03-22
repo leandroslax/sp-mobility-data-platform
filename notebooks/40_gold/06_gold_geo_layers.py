@@ -1,8 +1,10 @@
-# Databricks notebook source
-storage_account = "stspmobilitydev001"
+# COMMAND ----------
+%run ../00_setup/00_config
+# COMMAND ----------
+%run ../00_setup/01_adls_gen2_oauth_connection
 
-bronze_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/gtfs"
-gold_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_geo"
+# Databricks notebook source
+
 
 print(bronze_path)
 print(gold_path)
@@ -10,7 +12,6 @@ print(gold_path)
 # COMMAND ----------
 
 dbutils.fs.mkdirs(gold_path)
-dbutils.fs.ls(f"abfss://gold@{storage_account}.dfs.core.windows.net/")
 
 # COMMAND ----------
 

@@ -1,3 +1,8 @@
+# COMMAND ----------
+%run ../00_setup/00_config
+# COMMAND ----------
+%run ../00_setup/01_adls_gen2_oauth_connection
+
 # Databricks notebook source
 
 
@@ -7,13 +12,7 @@ print("🚀 Initializing Lakehouse structure...")
 
 # COMMAND ----------
 
-storage_account = "stspmobilitydev001"
 
-landing = f"abfss://landing@{storage_account}.dfs.core.windows.net/"
-bronze = f"abfss://bronze@{storage_account}.dfs.core.windows.net/"
-silver = f"abfss://silver@{storage_account}.dfs.core.windows.net/"
-gold = f"abfss://gold@{storage_account}.dfs.core.windows.net/"
-checkpoint = f"abfss://checkpoint@{storage_account}.dfs.core.windows.net/"
 
 # COMMAND ----------
 

@@ -1,14 +1,13 @@
+# COMMAND ----------
+%run ../00_setup/00_config
+# COMMAND ----------
+%run ../00_setup/01_adls_gen2_oauth_connection
+
 # Databricks notebook source
 
 # COMMAND ----------
 
-storage_account = "stspmobilitydev001"
 
-bronze_path = f"abfss://bronze@{storage_account}.dfs.core.windows.net/gtfs"
-silver_path = f"abfss://silver@{storage_account}.dfs.core.windows.net/gtfs"
-gold_mobility_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility"
-gold_geo_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_geo"
-gold_map_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_map"
 
 # COMMAND ----------
 
@@ -127,9 +126,7 @@ dbutils.library.restartPython()
 
 # reload_bus_stops_dataset
 
-storage_account = "stspmobilitydev001"
 
-gold_map_path = f"abfss://gold@{storage_account}.dfs.core.windows.net/mobility_map"
 
 bus_stops_map = spark.read.format("delta").load(f"{gold_map_path}/bus_stops_map")
 

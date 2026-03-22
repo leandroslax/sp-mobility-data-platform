@@ -1,7 +1,10 @@
+# COMMAND ----------
+%run ../00_setup/00_config
+# COMMAND ----------
+%run ../00_setup/01_adls_gen2_oauth_connection
+
 # Databricks notebook source
-storage_account = "stspmobilitydev001"
 scope = "kv-sp-mobility"
-account_fqdn = f"{storage_account}.dfs.core.windows.net"
 
 client_id = dbutils.secrets.get(scope=scope, key="databricks-sp-client-id")
 client_secret = dbutils.secrets.get(scope=scope, key="databricks-sp-secret")
@@ -34,8 +37,6 @@ print("provider =", spark.conf.get(f"fs.azure.account.oauth.provider.type.{accou
 
 # COMMAND ----------
 
-storage_account = "stspmobilitydev001"
-account_fqdn = f"{storage_account}.dfs.core.windows.net"
 
 client_id = dbutils.secrets.get(scope="kv-sp-mobility", key="databricks-sp-client-id")
 client_secret = dbutils.secrets.get(scope="kv-sp-mobility", key="databricks-sp-secret")
