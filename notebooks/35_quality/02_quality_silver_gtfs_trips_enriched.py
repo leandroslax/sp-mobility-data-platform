@@ -19,7 +19,6 @@
    "outputs": [],
    "source": [
     "# Databricks notebook source\n",
-    "# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection\n",
     "\n",
     "from pyspark.sql.functions import col\n",
     "\n",
