@@ -4,11 +4,11 @@
 %run ../00_setup/00_config
 
 # COMMAND ----------
-print("🚀 Starting GTFS ingestion (ULTRA PERFORMANCE mode)...")
+print("🚀 Starting GTFS ingestion (PERFORMANCE MODE)...")
 
 # COMMAND ----------
 import zipfile
-import io
+import os
 
 # COMMAND ----------
 # Paths
@@ -18,44 +18,42 @@ container = container_bronze
 base_path = f"abfss://{container}@{account_fqdn}"
 
 zip_path = f"{base_path}/gtfs/raw/cittamobi_gtfs.zip"
-extract_path = f"{base_path}/gtfs/extracted"
-delta_path = f"{base_path}/gtfs/delta"
+local_zip = "/tmp/gtfs.zip"
+extract_path = "/tmp/gtfs"
 
 # COMMAND ----------
-print("📥 Reading ZIP as binary (no collect)...")
+print("📥 Copying ZIP to local...")
 
-df_binary = spark.read.format("binaryFile").load(zip_path)
-
-# COMMAND ----------
-print("📦 Extracting ZIP and writing directly to ADLS...")
-
-def extract_and_save(row):
-    import zipfile
-    import io
-
-    z = zipfile.ZipFile(io.BytesIO(row.content))
-
-    for file_name in z.namelist():
-        if file_name.endswith(".txt"):
-            file_content = z.read(file_name)
-
-            output_path = f"{extract_path}/{file_name}"
-
-            dbutils.fs.put(output_path, file_content.decode("utf-8"), True)
-
-df_binary.foreach(extract_and_save)
+dbutils.fs.cp(zip_path, f"file:{local_zip}", True)
 
 # COMMAND ----------
-print("📥 Reading extracted files with Spark (distributed)...")
+print("📦 Extracting ZIP...")
 
-df = spark.read.option("header", True).csv(f"{extract_path}/*.txt")
+os.makedirs(extract_path, exist_ok=True)
+
+with zipfile.ZipFile(local_zip, 'r') as zip_ref:
+    zip_ref.extractall(extract_path)
+
+# COMMAND ----------
+print("📥 Loading with Spark (parallelized)...")
+
+df = spark.read.option("header", True).csv(f"file:{extract_path}/*.txt")
+
+# 🔥 AQUI ESTÁ O BOOST
+df = df.repartition(8)
 
 display(df)
 
 # COMMAND ----------
-print("💾 Saving as Delta...")
+delta_path = f"{base_path}/gtfs/delta"
 
-df.write.mode("overwrite").format("delta").save(delta_path)
+print("💾 Writing Delta (optimized)...")
+
+df.write \
+  .format("delta") \
+  .mode("overwrite") \
+  .option("overwriteSchema", "true") \
+  .save(delta_path)
 
 # COMMAND ----------
-print("✅ GTFS ingestion completed (ULTRA FAST)!")
+print("✅ GTFS ingestion completed FAST!")
