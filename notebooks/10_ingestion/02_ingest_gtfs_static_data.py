@@ -4,11 +4,11 @@
 %run ../00_setup/00_config
 
 # COMMAND ----------
-print("🚀 Starting GTFS ingestion (FAST mode)...")
+print("🚀 Starting GTFS ingestion (ULTRA PERFORMANCE mode)...")
 
 # COMMAND ----------
 import zipfile
-import os
+import io
 
 # COMMAND ----------
 # Paths
@@ -18,38 +18,44 @@ container = container_bronze
 base_path = f"abfss://{container}@{account_fqdn}"
 
 zip_path = f"{base_path}/gtfs/raw/cittamobi_gtfs.zip"
-local_zip = "/tmp/gtfs.zip"
-extract_path = "/tmp/gtfs"
+extract_path = f"{base_path}/gtfs/extracted"
+delta_path = f"{base_path}/gtfs/delta"
 
 # COMMAND ----------
-print("📥 Copying ZIP to local driver...")
+print("📥 Reading ZIP as binary (no collect)...")
 
-dbutils.fs.cp(zip_path, f"file:{local_zip}", True)
-
-# COMMAND ----------
-print("📦 Extracting ZIP locally...")
-
-os.makedirs(extract_path, exist_ok=True)
-
-with zipfile.ZipFile(local_zip, 'r') as zip_ref:
-    zip_ref.extractall(extract_path)
-
-files = os.listdir(extract_path)
-print(f"Arquivos extraídos: {len(files)}")
+df_binary = spark.read.format("binaryFile").load(zip_path)
 
 # COMMAND ----------
-print("📥 Loading files with Spark...")
+print("📦 Extracting ZIP and writing directly to ADLS...")
 
-df = spark.read.option("header", True).csv(f"file:{extract_path}/*.txt")
+def extract_and_save(row):
+    import zipfile
+    import io
+
+    z = zipfile.ZipFile(io.BytesIO(row.content))
+
+    for file_name in z.namelist():
+        if file_name.endswith(".txt"):
+            file_content = z.read(file_name)
+
+            output_path = f"{extract_path}/{file_name}"
+
+            dbutils.fs.put(output_path, file_content.decode("utf-8"), True)
+
+df_binary.foreach(extract_and_save)
+
+# COMMAND ----------
+print("📥 Reading extracted files with Spark (distributed)...")
+
+df = spark.read.option("header", True).csv(f"{extract_path}/*.txt")
 
 display(df)
 
 # COMMAND ----------
-delta_path = f"{base_path}/gtfs/delta"
-
-print("💾 Saving Delta...")
+print("💾 Saving as Delta...")
 
 df.write.mode("overwrite").format("delta").save(delta_path)
 
 # COMMAND ----------
-print("✅ GTFS ingestion completed FAST!")
+print("✅ GTFS ingestion completed (ULTRA FAST)!")
