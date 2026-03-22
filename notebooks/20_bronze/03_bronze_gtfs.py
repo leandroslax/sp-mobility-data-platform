@@ -10,12 +10,12 @@ print("🚀 Starting BRONZE GTFS processing...")
 
 # COMMAND ----------
 
-# Paths
-print("📂 Setting paths...")
+# Usando paths vindos do config
+print("📂 Using paths from config...")
 
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-adls_extract_path = f"{base_path}/gtfs/extracted"
-delta_base_path = f"{base_path}/gtfs/bronze"
+print(f"Base path: {base_path}")
+print(f"Extract path: {extract_path}")
+print(f"Bronze path: {bronze_path}")
 
 # COMMAND ----------
 
@@ -25,7 +25,7 @@ print("📥 Reading GTFS files (distributed)...")
 df = spark.read \
     .option("header", True) \
     .option("inferSchema", False) \
-    .csv(f"{adls_extract_path}/*.txt")
+    .csv(f"{extract_path}/*.txt")
 
 print(f"📊 Columns: {len(df.columns)}")
 
@@ -38,13 +38,13 @@ df = df.withColumn("ingestion_time", current_timestamp())
 
 # COMMAND ----------
 
-# Write Delta (optimized)
+# Write Delta
 print("💾 Writing to BRONZE (Delta)...")
 
 df.write \
     .format("delta") \
     .mode("overwrite") \
-    .save(delta_base_path)
+    .save(bronze_path)
 
 # COMMAND ----------
 
