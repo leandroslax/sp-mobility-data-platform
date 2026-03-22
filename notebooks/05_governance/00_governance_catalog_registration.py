@@ -1,3 +1,5 @@
+# Databricks notebook source
+# COMMAND ----------
 {
  "cells": [
   {
@@ -15,7 +17,7 @@
    },
    "outputs": [],
    "source": [
-    "# Databricks notebook source\n",
+    "\n",
     "\n",
     "spark.sql(\"\"\"\n",
     "CREATE DATABASE IF NOT EXISTS sp_mobility_bronze\n",

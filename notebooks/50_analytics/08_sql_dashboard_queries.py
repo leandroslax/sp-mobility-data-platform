@@ -1,7 +1,5 @@
 # Databricks notebook source
 # COMMAND ----------
-%run ../00_setup/00_config
-# COMMAND ----------
 
 
 

@@ -1,12 +1,7 @@
 # Databricks notebook source
 # COMMAND ----------
-%run ../00_setup/00_config
-# COMMAND ----------
 
 
-# COMMAND ----------
-# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
-# COMMAND ----------
 from pyspark.sql.functions import *
 
 silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
