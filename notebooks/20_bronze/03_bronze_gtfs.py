@@ -1,4 +1,8 @@
 # Databricks notebook source
+# COMMAND ----------
+# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
+# COMMAND ----------
+# Databricks notebook source
 
 # COMMAND ----------
 

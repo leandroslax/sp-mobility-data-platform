@@ -1,3 +1,7 @@
+# Databricks notebook source
+# COMMAND ----------
+# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
+# COMMAND ----------
 
 storage_account = "stspmobilitydev001"
 scope = "kv-sp-mobility"

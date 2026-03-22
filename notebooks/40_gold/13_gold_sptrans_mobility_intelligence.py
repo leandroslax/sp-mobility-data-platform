@@ -1,3 +1,7 @@
+# Databricks notebook source
+# COMMAND ----------
+# MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
+# COMMAND ----------
 bronze_gtfs_routes_path = "abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs/gtfs_routes"
 silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
 
