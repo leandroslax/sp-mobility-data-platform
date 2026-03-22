@@ -1,51 +1,33 @@
 # Databricks notebook source
-
-# MAGIC %run /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_config
-
-# COMMAND ----------
+# MAGIC %run ../00_setup/00_config
 
 from pyspark.sql.functions import current_timestamp
 
 print("🚀 Starting BRONZE GTFS processing...")
 
-# COMMAND ----------
+# DEBUG
+print("DEBUG CONFIG:")
+print(f"container={container}")
+print(f"storage_account={storage_account}")
 
-# Usando paths vindos do config
-print("📂 Using paths from config...")
+# Paths
+print("📁 Setting paths...")
+
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
+bronze_path = f"{base_path}/gtfs/bronze"
 
 print(f"Base path: {base_path}")
-print(f"Extract path: {extract_path}")
 print(f"Bronze path: {bronze_path}")
 
-# COMMAND ----------
+# Leitura do delta gerado no ingest
+delta_path = f"{base_path}/gtfs/delta"
 
-# Read data (distributed)
-print("📥 Reading GTFS files (distributed)...")
+df = spark.read.format("delta").load(delta_path)
 
-df = spark.read \
-    .option("header", True) \
-    .option("inferSchema", False) \
-    .csv(f"{extract_path}/*.txt")
-
-print(f"📊 Columns: {len(df.columns)}")
-
-# COMMAND ----------
-
-# Add metadata
-print("🧠 Adding metadata...")
-
+# Adiciona metadata
 df = df.withColumn("ingestion_time", current_timestamp())
 
-# COMMAND ----------
+# Escrita bronze
+df.write.format("delta").mode("overwrite").save(bronze_path)
 
-# Write Delta
-print("💾 Writing to BRONZE (Delta)...")
-
-df.write \
-    .format("delta") \
-    .mode("overwrite") \
-    .save(bronze_path)
-
-# COMMAND ----------
-
-print("✅ BRONZE GTFS completed successfully!")
+print("✅ BRONZE layer completed!")
