@@ -3,67 +3,50 @@
 
 # COMMAND ----------
 
-print("🚀 Starting GTFS ingestion (FINAL OPTIMIZED)...")
+print("🚀 Starting GTFS ingestion (PERFORMANCE MODE)...")
 
 # COMMAND ----------
 
-import zipfile
-import os
+spark.conf.set("spark.sql.shuffle.partitions", "8")
+spark.conf.set("spark.databricks.io.cache.enabled", "true")
 
 # COMMAND ----------
+
+from pyspark.sql.functions import input_file_name
 
 # Paths
-storage_account = account_name
-container = container_bronze
+storage_account = "stspmobilitydev001"
+container = "bronze"
 
-base_path = f"abfss://{container}@{account_fqdn}"
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-zip_path = f"{base_path}/gtfs/raw/cittamobi_gtfs.zip"
-local_zip = "/tmp/gtfs.zip"
-extract_path = "/tmp/gtfs"
 adls_extract_path = f"{base_path}/gtfs/extracted"
-
-# COMMAND ----------
-
-print("📥 Copying ZIP...")
-
-dbutils.fs.cp(zip_path, f"file:{local_zip}", True)
-
-# COMMAND ----------
-
-print("📦 Extracting ZIP...")
-
-os.makedirs(extract_path, exist_ok=True)
-
-with zipfile.ZipFile(local_zip, 'r') as zip_ref:
-    zip_ref.extractall(extract_path)
-
-# COMMAND ----------
-
-print("⬆️ Moving files to ADLS...")
-
-files = os.listdir(extract_path)
-
-for f in files:
-    dbutils.fs.cp(f"file:{extract_path}/{f}", f"{adls_extract_path}/{f}", True)
-
-# COMMAND ----------
-
-print("📥 Reading from ADLS (distributed)...")
-
-df = spark.read.option("header", True).csv(f"{adls_extract_path}/*.txt")
-
-display(df)
-
-# COMMAND ----------
-
 delta_path = f"{base_path}/gtfs/delta"
 
-df.write \
-  .format("delta") \
-  .mode("overwrite") \
-  .save(delta_path)
+# COMMAND ----------
+
+print("📂 Reading GTFS files from ADLS (distributed)...")
+
+df = spark.read \
+    .option("header", True) \
+    .option("inferSchema", False) \
+    .csv(f"{adls_extract_path}/*.txt")
 
 # COMMAND ----------
 
-print("✅ GTFS ingestion completed FAST!")
+print("⚙️ Repartitioning for performance...")
+
+df = df.repartition(8)
+
+# COMMAND ----------
+
+print("💾 Writing to Delta (optimized)...")
+
+df.write \
+    .format("delta") \
+    .mode("append") \
+    .save(delta_path)
+
+# COMMAND ----------
+
+print("🎯 GTFS ingestion completed (FAST MODE)!")
