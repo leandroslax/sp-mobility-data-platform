@@ -1,80 +1,77 @@
 # Databricks
 %run ../00_setup/00_config
 
-# Databricks notebook source
+# COMMAND ----------
 
-
+print("🚀 Starting Bronze GTFS processing...")
 
 # COMMAND ----------
 
+storage_account = "stspmobilitydev001"
+container = "bronze"
 
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-print("Landing extracted:", landing_extracted_path)
-
-# COMMAND ----------
-
-display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/"))
-
-# COMMAND ----------
-
-routes_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/routes.txt")
-)
-
+raw_path = f"{base_path}/gtfs/raw"
+bronze_path = f"{base_path}/gtfs/bronze"
 
 # COMMAND ----------
 
-stops_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/stops.txt")
-)
+print("📂 Listing GTFS raw files...")
+files = dbutils.fs.ls(f"{raw_path}/")
 
+display(files)
 
 # COMMAND ----------
 
-trips_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/trips.txt")
-)
+import zipfile
+import io
 
+print("📦 Reading ZIP...")
 
-# COMMAND ----------
+zip_file = f"{raw_path}/cittamobi_gtfs.zip"
 
-stop_times_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/stop_times.txt")
-)
+binary_df = spark.read.format("binaryFile").load(zip_file)
 
+files_data = {}
 
-# COMMAND ----------
-
-calendar_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/calendar.txt")
-)
-
+for row in binary_df.collect():
+    z = zipfile.ZipFile(io.BytesIO(row.content))
+    
+    for file_name in z.namelist():
+        if file_name.endswith(".txt"):
+            content = z.read(file_name).decode("utf-8")
+            files_data[file_name] = content
 
 # COMMAND ----------
 
-shapes_df = (
-    spark.read
-         .option("header", "true")
-         .option("inferSchema", "true")
-         .csv(f"{landing_extracted_path}/shapes.txt")
-)
+from pyspark.sql import Row
 
+def save_gtfs_table(file_name, content):
+    print(f"💾 Processing {file_name}...")
+
+    lines = content.split("\n")
+    header = lines[0].split(",")
+    
+    rows = []
+    for line in lines[1:]:
+        if line.strip():
+            values = line.split(",")
+            rows.append(Row(**dict(zip(header, values))))
+    
+    df = spark.createDataFrame(rows)
+    
+    table_name = file_name.replace(".txt", "")
+    
+    df.write.mode("overwrite").format("delta").save(f"{bronze_path}/{table_name}")
+    
+    print(f"✅ Saved: {table_name}")
 
 # COMMAND ----------
 
+for file_name, content in files_data.items():
+    save_gtfs_table(file_name, content)
 
+# COMMAND ----------
+
+print("🎯 Bronze GTFS completed!")

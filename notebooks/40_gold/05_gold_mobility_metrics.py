@@ -1,42 +1,64 @@
 # Databricks
 %run ../00_setup/00_config
 
-# Databricks notebook source
+# COMMAND ----------
 
+print("🚀 Starting Gold Mobility Metrics...")
 
 # COMMAND ----------
 
+storage_account = "stspmobilitydev001"
+container = "bronze"
 
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-print(bronze_path)
-print(silver_path)
-print(gold_path)
-
-# COMMAND ----------
-
-trips_df = spark.read.format("delta").load(f"{silver_path}/gtfs_trips_enriched")
+silver_path = f"{base_path}/gtfs/silver"
+gold_path = f"{base_path}/gtfs/gold"
 
 # COMMAND ----------
 
-from pyspark.sql.functions import count
+print("📥 Reading Silver dataset...")
 
-trips_per_route = (
-    trips_df.groupBy("route_id", "route_short_name", "route_long_name")
-    .agg(count("trip_id").alias("total_trips"))
+gtfs = spark.read.format("delta").load(f"{silver_path}/gtfs_enriched")
+
+# COMMAND ----------
+
+from pyspark.sql.functions import countDistinct, count
+
+print("📊 Calculating KPIs...")
+
+kpis = gtfs.agg(
+    countDistinct("route_id").alias("total_routes"),
+    countDistinct("trip_id").alias("total_trips"),
+    countDistinct("stop_id").alias("total_stops"),
+    count("*").alias("total_events")
 )
 
-# COMMAND ----------
-
-display(trips_per_route.orderBy("total_trips", ascending=False))
+display(kpis)
 
 # COMMAND ----------
 
-dbutils.fs.mkdirs(gold_path)
+print("📈 Route performance...")
 
-trips_per_route.write.format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/bus_lines_operational")
+route_performance = (
+    gtfs.groupBy("route_id")
+    .agg(
+        countDistinct("trip_id").alias("trips_per_route"),
+        countDistinct("stop_id").alias("stops_per_route"),
+        count("*").alias("events_per_route")
+    )
+)
+
+display(route_performance)
 
 # COMMAND ----------
 
-display(dbutils.fs.ls(gold_path))
+print("💾 Saving Gold tables...")
+
+kpis.write.mode("overwrite").format("delta").save(f"{gold_path}/kpis")
+
+route_performance.write.mode("overwrite").format("delta").save(f"{gold_path}/route_performance")
+
+# COMMAND ----------
+
+print("🎯 Gold Mobility Metrics completed!")
