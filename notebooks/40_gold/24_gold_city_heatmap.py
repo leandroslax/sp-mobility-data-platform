@@ -1,9 +1,11 @@
+# Databricks notebook source
+# COMMAND ----------
 # COMMAND ----------
 %run ../00_setup/00_config
 # COMMAND ----------
 %run ../00_setup/01_adls_gen2_oauth_connection
 
-# Databricks notebook source
+
 # COMMAND ----------
 # MAGIC %run ../00_setup/00_adls_gen2_oauth_connection
 # COMMAND ----------
@@ -27,7 +29,7 @@
    },
    "outputs": [],
    "source": [
-    "# Databricks notebook source\n",
+    "\n",
     "from pyspark.sql import functions as F\n",
     "\n",
     "# COMMAND ----------\n",

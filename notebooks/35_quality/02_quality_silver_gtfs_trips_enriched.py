@@ -1,3 +1,5 @@
+# Databricks notebook source
+# COMMAND ----------
 # COMMAND ----------
 %run ../00_setup/00_config
 # COMMAND ----------
@@ -23,7 +25,7 @@
    },
    "outputs": [],
    "source": [
-    "# Databricks notebook source\n",
+    "\n",
     "\n",
     "from pyspark.sql.functions import col\n",
     "\n",
