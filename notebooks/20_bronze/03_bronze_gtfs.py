@@ -1,81 +1,53 @@
 # Databricks notebook source
-
-# Databricks notebook source
-
-# Databricks
-%run ../00_setup/00_config
+# MAGIC %run ../00_setup/00_config
 
 # COMMAND ----------
 
-print("🚀 Starting Bronze GTFS processing...")
+print("🥉 Starting Bronze GTFS processing...")
 
 # COMMAND ----------
 
+spark.conf.set("spark.sql.shuffle.partitions", "8")
+
+# COMMAND ----------
+
+from pyspark.sql.functions import input_file_name
+
+# Paths
 storage_account = "stspmobilitydev001"
 container = "bronze"
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-raw_path = f"{base_path}/gtfs/raw"
+raw_path = f"{base_path}/gtfs/extracted"
 bronze_path = f"{base_path}/gtfs/bronze"
 
 # COMMAND ----------
 
-print("📂 Listing GTFS raw files...")
-files = dbutils.fs.ls(f"{raw_path}/")
+print("📂 Reading extracted files...")
 
-display(files)
-
-# COMMAND ----------
-
-import zipfile
-import io
-
-print("📦 Reading ZIP...")
-
-zip_file = f"{raw_path}/cittamobi_gtfs.zip"
-
-binary_df = spark.read.format("binaryFile").load(zip_file)
-
-files_data = {}
-
-for row in binary_df.collect():
-    z = zipfile.ZipFile(io.BytesIO(row.content))
-    
-    for file_name in z.namelist():
-        if file_name.endswith(".txt"):
-            content = z.read(file_name).decode("utf-8")
-            files_data[file_name] = content
+df = spark.read \
+    .option("header", True) \
+    .option("inferSchema", False) \
+    .csv(f"{raw_path}/*.txt") \
+    .withColumn("source_file", input_file_name())
 
 # COMMAND ----------
 
-from pyspark.sql import Row
+print("⚙️ Repartitioning...")
 
-def save_gtfs_table(file_name, content):
-    print(f"💾 Processing {file_name}...")
-
-    lines = content.split("\n")
-    header = lines[0].split(",")
-    
-    rows = []
-    for line in lines[1:]:
-        if line.strip():
-            values = line.split(",")
-            rows.append(Row(**dict(zip(header, values))))
-    
-    df = spark.createDataFrame(rows)
-    
-    table_name = file_name.replace(".txt", "")
-    
-    df.write.mode("overwrite").format("delta").save(f"{bronze_path}/{table_name}")
-    
-    print(f"✅ Saved: {table_name}")
+df = df.repartition(8)
 
 # COMMAND ----------
 
-for file_name, content in files_data.items():
-    save_gtfs_table(file_name, content)
+print("📊 Writing Bronze layer (partitioned by file)...")
+
+df.write \
+    .format("delta") \
+    .mode("append") \
+    .partitionBy("source_file") \
+    .save(bronze_path)
 
 # COMMAND ----------
 
-print("🎯 Bronze GTFS completed!")
+print("🎯 Bronze layer completed!")
