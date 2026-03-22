@@ -1,58 +1,70 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/00_config
 
 # COMMAND ----------
-%run ../00_setup/00_config
+
+print("🥇 Starting Gold Mobility Metrics...")
 
 # COMMAND ----------
-print("🚀 Starting Gold Mobility Metrics...")
+
+spark.conf.set("spark.sql.shuffle.partitions", "8")
 
 # COMMAND ----------
-from pyspark.sql.functions import countDistinct, count
+
+from pyspark.sql.functions import count, countDistinct
 
 # Paths
-storage_account = account_name
-container = container_bronze
+storage_account = "stspmobilitydev001"
+container = "bronze"
 
-base_path = f"abfss://{container}@{account_fqdn}"
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
 silver_path = f"{base_path}/gtfs/silver"
 gold_path = f"{base_path}/gtfs/gold"
 
 # COMMAND ----------
-print("📥 Reading Silver dataset...")
 
-gtfs = spark.read.format("delta").load(f"{silver_path}/gtfs_enriched")
+print("📂 Reading Silver data...")
+
+trips = spark.read.format("delta").load(f"{silver_path}/trips")
+stops = spark.read.format("delta").load(f"{silver_path}/stops")
+routes = spark.read.format("delta").load(f"{silver_path}/routes")
 
 # COMMAND ----------
+
 print("📊 Calculating KPIs...")
 
-kpis = gtfs.agg(
+kpis = trips.agg(
     countDistinct("route_id").alias("total_routes"),
-    countDistinct("trip_id").alias("total_trips"),
-    countDistinct("stop_id").alias("total_stops"),
-    count("*").alias("total_events")
+    countDistinct("trip_id").alias("total_trips")
 )
 
 # COMMAND ----------
-print("📈 Calculating route performance...")
 
-route_performance = gtfs.groupBy("route_id").agg(
-    countDistinct("trip_id").alias("trips_per_route"),
-    countDistinct("stop_id").alias("stops_per_route"),
-    count("*").alias("events_per_route")
+print("📈 Trips per route...")
+
+trips_per_route = trips.groupBy("route_id").agg(
+    countDistinct("trip_id").alias("trips_count")
 )
 
 # COMMAND ----------
+
+print("🛑 Stops per route...")
+
+stops_per_route = stops.groupBy("stop_id").agg(
+    count("*").alias("stop_usage")
+)
+
+# COMMAND ----------
+
 print("💾 Writing Gold tables...")
 
-kpis.write.mode("overwrite").format("delta").save(f"{gold_path}/kpis")
+kpis.write.format("delta").mode("overwrite").save(f"{gold_path}/kpis")
 
-route_performance.write \
-    .repartition(1) \
-    .write \
-    .mode("overwrite") \
-    .format("delta") \
-    .save(f"{gold_path}/route_performance")
+trips_per_route.write.format("delta").mode("overwrite").save(f"{gold_path}/trips_per_route")
+
+stops_per_route.write.format("delta").mode("overwrite").save(f"{gold_path}/stops_per_route")
 
 # COMMAND ----------
-print("🎯 Gold Mobility Metrics completed!")
+
+print("🎯 Gold layer completed!")
