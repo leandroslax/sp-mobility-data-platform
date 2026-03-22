@@ -4,7 +4,7 @@
 %run ../00_setup/00_config
 
 # COMMAND ----------
-print("🚀 Starting GTFS ingestion (PERFORMANCE MODE)...")
+print("🚀 Starting GTFS ingestion (FINAL OPTIMIZED)...")
 
 # COMMAND ----------
 import zipfile
@@ -20,9 +20,10 @@ base_path = f"abfss://{container}@{account_fqdn}"
 zip_path = f"{base_path}/gtfs/raw/cittamobi_gtfs.zip"
 local_zip = "/tmp/gtfs.zip"
 extract_path = "/tmp/gtfs"
+adls_extract_path = f"{base_path}/gtfs/extracted"
 
 # COMMAND ----------
-print("📥 Copying ZIP to local...")
+print("📥 Copying ZIP...")
 
 dbutils.fs.cp(zip_path, f"file:{local_zip}", True)
 
@@ -35,24 +36,26 @@ with zipfile.ZipFile(local_zip, 'r') as zip_ref:
     zip_ref.extractall(extract_path)
 
 # COMMAND ----------
-print("📥 Loading with Spark (parallelized)...")
+print("⬆️ Moving files to ADLS...")
 
-df = spark.read.option("header", True).csv(f"file:{extract_path}/*.txt")
+files = os.listdir(extract_path)
 
-# 🔥 AQUI ESTÁ O BOOST
-df = df.repartition(8)
+for f in files:
+    dbutils.fs.cp(f"file:{extract_path}/{f}", f"{adls_extract_path}/{f}", True)
+
+# COMMAND ----------
+print("📥 Reading from ADLS (distributed)...")
+
+df = spark.read.option("header", True).csv(f"{adls_extract_path}/*.txt")
 
 display(df)
 
 # COMMAND ----------
 delta_path = f"{base_path}/gtfs/delta"
 
-print("💾 Writing Delta (optimized)...")
-
 df.write \
   .format("delta") \
   .mode("overwrite") \
-  .option("overwriteSchema", "true") \
   .save(delta_path)
 
 # COMMAND ----------
