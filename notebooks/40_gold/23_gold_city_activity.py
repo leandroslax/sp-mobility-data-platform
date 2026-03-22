@@ -28,7 +28,7 @@
     "\n",
     "silver_table = \"sp_mobility_silver.sptrans_vehicle_positions\"\n",
     "gold_table = \"sp_mobility_gold.city_activity\"\n",
-    "gold_city_activity_path = \"abfss://gold@stspmobilitydev001.dfs.core.windows.net/city_activity\"\n",
+    "gold_city_activity_path = \"abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/city_activity\"\n",
     "\n",
     "# COMMAND ----------\n",
     "\n",

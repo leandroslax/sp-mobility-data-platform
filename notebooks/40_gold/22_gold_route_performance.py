@@ -7,8 +7,8 @@ from pyspark.sql import functions as F
 
 # COMMAND ----------
 
-silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-gold_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance"
+silver_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
+gold_path = "abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/route_performance"
 
 # COMMAND ----------
 
@@ -99,7 +99,7 @@ print("Total registros validados no path:", validation_df.count())
 # COMMAND ----------
 
 display(
-    dbutils.fs.ls("abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance")
+    dbutils.fs.ls("abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/route_performance")
 )
 
 # COMMAND ----------

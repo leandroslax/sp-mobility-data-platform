@@ -3,8 +3,8 @@
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-bronze_path = "abfss://bronze@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
+bronze_path = "abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
+silver_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
 
 df_bronze = spark.read.format("delta").load(bronze_path)
 

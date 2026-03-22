@@ -30,5 +30,5 @@ def log_pipeline_event(
     audit_df.write \
         .format("delta") \
         .mode("append") \
-        .save("abfss://gold@stspmobilitydev001.dfs.core.windows.net/audit/pipeline_audit")
+        .save("abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/audit/pipeline_audit")
 

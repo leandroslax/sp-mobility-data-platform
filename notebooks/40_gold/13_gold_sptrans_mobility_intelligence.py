@@ -1,7 +1,7 @@
 # Databricks notebook source
 
-bronze_gtfs_routes_path = "abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs/gtfs_routes"
-silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
+bronze_gtfs_routes_path = "abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/gtfs/gtfs_routes"
+silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/gtfs/routes"
 
 routes_bronze_df = spark.read.format("delta").load(bronze_gtfs_routes_path)
 
@@ -28,9 +28,9 @@ print("Total silver routes:", routes_df.count())
 
 from pyspark.sql import functions as F
 
-silver_vehicle_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs/routes"
-gold_mobility_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/mobility/intelligence"
+silver_vehicle_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
+silver_gtfs_routes_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/gtfs/routes"
+gold_mobility_path = "abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/mobility/intelligence"
 
 vehicle_positions_df = spark.read.format("delta").load(silver_vehicle_path)
 routes_df = spark.read.format("delta").load(silver_gtfs_routes_path)

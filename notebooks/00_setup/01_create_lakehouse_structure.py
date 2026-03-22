@@ -23,7 +23,7 @@
     "# CONFIG\n",
     "# ==============================\n",
     "\n",
-    "storage_account = \"stspmobilitydev001\"\n",
+    "storage_account = \"stspmobilitydev001dev001\"\n",
     "\n",
     "bronze_base_path = f\"abfss://bronze@{storage_account}.dfs.core.windows.net/\"\n",
     "silver_base_path = f\"abfss://silver@{storage_account}.dfs.core.windows.net/\"\n",

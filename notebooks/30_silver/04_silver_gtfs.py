@@ -45,4 +45,4 @@ display(dbutils.fs.ls(silver_path))
 
 # COMMAND ----------
 
-display(dbutils.fs.ls("abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs_trips_enriched"))
+display(dbutils.fs.ls("abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/gtfs_trips_enriched"))

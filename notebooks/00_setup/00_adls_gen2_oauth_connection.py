@@ -55,7 +55,7 @@ for k, v in configs.items():
     hc.set(k, v)
 
 
-dbutils.fs.ls("abfss://landing@stspmobilitydev001.dfs.core.windows.net/")
+dbutils.fs.ls("abfss://landing@stspmobilitydev001dev001.dfs.core.windows.net/")
 
 # COMMAND ----------
 

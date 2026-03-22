@@ -13,7 +13,7 @@ variable "resource_group_name" {
 variable "storage_account_name" {
   description = "Globally unique storage account name"
   type        = string
-  default     = "stspmobilitydev001"
+  default     = "stspmobilitydev001dev001"
 }
 
 variable "key_vault_name" {

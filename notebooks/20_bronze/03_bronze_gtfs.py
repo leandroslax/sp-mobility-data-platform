@@ -10,7 +10,7 @@ print("Landing extracted:", landing_extracted_path)
 
 # COMMAND ----------
 
-display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001.dfs.core.windows.net/"))
+display(dbutils.fs.ls("abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/"))
 
 # COMMAND ----------
 

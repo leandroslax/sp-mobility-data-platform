@@ -2,8 +2,8 @@
 
 from pyspark.sql.functions import *
 
-silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
-gold_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"
+silver_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
+gold_path = "abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
 
 df_silver = spark.read.format("delta").load(silver_path)
 

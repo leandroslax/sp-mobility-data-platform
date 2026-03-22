@@ -25,8 +25,8 @@
     "\n",
     "# COMMAND ----------\n",
     "\n",
-    "silver_vehicle_positions_path = \"abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions\"\n",
-    "gold_city_heatmap_path = \"abfss://gold@stspmobilitydev001.dfs.core.windows.net/map/city_heatmap\"\n",
+    "silver_vehicle_positions_path = \"abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions\"\n",
+    "gold_city_heatmap_path = \"abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/map/city_heatmap\"\n",
     "\n",
     "# COMMAND ----------\n",
     "\n",
@@ -100,7 +100,7 @@
     "# COMMAND ----------\n",
     "\n",
     "display(\n",
-    "    dbutils.fs.ls(\"abfss://gold@stspmobilitydev001.dfs.core.windows.net/map/city_heatmap\")\n",
+    "    dbutils.fs.ls(\"abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/map/city_heatmap\")\n",
     ")"
    ]
   }

@@ -14,7 +14,7 @@ print("Gold map:", gold_map_path)
 
 dbutils.fs.mkdirs(gold_map_path)
 
-display(dbutils.fs.ls("abfss://gold@stspmobilitydev001.dfs.core.windows.net/"))
+display(dbutils.fs.ls("abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/"))
 
 # COMMAND ----------
 
