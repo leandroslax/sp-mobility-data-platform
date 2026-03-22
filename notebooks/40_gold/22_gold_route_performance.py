@@ -1,7 +1,7 @@
 # Databricks notebook source
-# Databricks notebook source
-
 # COMMAND ----------
+
+
 
 
 
@@ -14,10 +14,14 @@ gold_path = "abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performa
 
 # COMMAND ----------
 
+# COMMAND ----------
+
 df = spark.read.format("delta").load(silver_path)
 
 print("COUNT source df:", df.count())
 df.printSchema()
+
+# COMMAND ----------
 
 # COMMAND ----------
 
@@ -29,6 +33,8 @@ df_clean = (
 )
 
 print("COUNT df_clean:", df_clean.count())
+
+# COMMAND ----------
 
 # COMMAND ----------
 
@@ -49,6 +55,8 @@ display(route_performance_df.limit(20))
 
 # COMMAND ----------
 
+# COMMAND ----------
+
 route_performance_df.write.format("delta") \
     .mode("overwrite") \
     .option("overwriteSchema", "true") \
@@ -57,10 +65,14 @@ route_performance_df.write.format("delta") \
 
 # COMMAND ----------
 
+# COMMAND ----------
+
 spark.catalog.clearCache()
 
 print("Dataset gold/route_performance criado com sucesso")
 print(f"Delta path atualizado: {gold_path}")
+
+# COMMAND ----------
 
 # COMMAND ----------
 
@@ -72,9 +84,13 @@ print("Total registros validados no path:", validation_df.count())
 
 # COMMAND ----------
 
+# COMMAND ----------
+
 display(
     dbutils.fs.ls("abfss://gold@stspmobilitydev001.dfs.core.windows.net/route_performance")
 )
+
+# COMMAND ----------
 
 # COMMAND ----------
 

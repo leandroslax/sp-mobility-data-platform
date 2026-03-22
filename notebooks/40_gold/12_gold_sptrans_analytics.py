@@ -1,7 +1,7 @@
 # Databricks notebook source
-# Databricks notebook source
-
 # COMMAND ----------
+
+
 from pyspark.sql.functions import *
 
 silver_path = "abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions"

@@ -1,64 +1,117 @@
 # Databricks notebook source
-# Databricks notebook source
-
 # COMMAND ----------
-# MAGIC %run ./00_adls_gen2_oauth_connection
-
-# COMMAND ----------
-# ==============================
-# CREATE LAKEHOUSE STRUCTURE
-# ==============================
-
-print("🚀 Creating Lakehouse structure...")
-
-try:
-    # Create Base Containers (if they don't exist)
-    # Note: dbutils.fs.mkdirs on abfss will fail if the container doesn't exist.
-    # The containers should be created in the Azure Portal or via Terraform.
-    # If they exist, mkdirs will just ensure the path is available.
-    
-    dbutils.fs.mkdirs(bronze_base_path)
-    dbutils.fs.mkdirs(silver_base_path)
-    dbutils.fs.mkdirs(gold_base_path)
-    print("✅ Base containers verified")
-
-    # ==============================
-    # CREATE DOMAIN FOLDERS
-    # ==============================
-    print("📂 Creating domain folders...")
-
-    # Bronze
-    dbutils.fs.mkdirs(f"{bronze_base_path}/gtfs/raw/")
-    dbutils.fs.mkdirs(f"{bronze_base_path}/sptrans/vehicle_positions/")
-
-    # Silver
-    dbutils.fs.mkdirs(f"{silver_base_path}/gtfs_trips_enriched/")
-    dbutils.fs.mkdirs(f"{silver_base_path}/sptrans/vehicle_positions/")
-
-    # Gold
-    dbutils.fs.mkdirs(f"{gold_base_path}/analytics/")
-    dbutils.fs.mkdirs(f"{gold_base_path}/mobility_intelligence/")
-    dbutils.fs.mkdirs(f"{gold_base_path}/route_performance/")
-
-    print("✅ Domain folders created")
-
-    # ==============================
-    # VALIDATION
-    # ==============================
-    print("🔍 Validating structure...")
-
-    print("Bronze:")
-    display(dbutils.fs.ls(bronze_base_path))
-
-    print("Silver:")
-    display(dbutils.fs.ls(silver_base_path))
-
-    print("Gold:")
-    display(dbutils.fs.ls(gold_base_path))
-
-    print("🎯 Lakehouse structure created successfully!")
-
-except Exception as e:
-    print(f"❌ Error creating structure: {str(e)}")
-    print("💡 Ensure the Service Principal has 'Storage Blob Data Contributor' permissions on the Storage Account.")
-    raise e
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 0,
+   "metadata": {
+    "application/vnd.databricks.v1+cell": {
+     "cellMetadata": {},
+     "inputWidgets": {},
+     "nuid": "b3620065-19ff-416a-98a4-c7f396b4dd27",
+     "showTitle": false,
+     "tableResultSettingsMap": {},
+     "title": ""
+    }
+   },
+   "outputs": [],
+   "source": [
+    "\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "# ==============================\n",
+    "# CONFIG\n",
+    "# ==============================\n",
+    "\n",
+    "storage_account = \"stspmobilitydev001\"\n",
+    "\n",
+    "bronze_base_path = f\"abfss://bronze@{storage_account}.dfs.core.windows.net/\"\n",
+    "silver_base_path = f\"abfss://silver@{storage_account}.dfs.core.windows.net/\"\n",
+    "gold_base_path   = f\"abfss://gold@{storage_account}.dfs.core.windows.net/\"\n",
+    "\n",
+    "print(\"✅ Config loaded\")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "# ==============================\n",
+    "# CREATE LAKEHOUSE STRUCTURE\n",
+    "# ==============================\n",
+    "\n",
+    "print(\"🚀 Creating Lakehouse structure...\")\n",
+    "\n",
+    "dbutils.fs.mkdirs(bronze_base_path)\n",
+    "dbutils.fs.mkdirs(silver_base_path)\n",
+    "dbutils.fs.mkdirs(gold_base_path)\n",
+    "\n",
+    "print(\"✅ Base containers created\")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "# ==============================\n",
+    "# CREATE DOMAIN FOLDERS\n",
+    "# ==============================\n",
+    "\n",
+    "print(\"📂 Creating domain folders...\")\n",
+    "\n",
+    "# Bronze\n",
+    "dbutils.fs.mkdirs(f\"{bronze_base_path}/gtfs/raw/\")\n",
+    "dbutils.fs.mkdirs(f\"{bronze_base_path}/sptrans/vehicle_positions/\")\n",
+    "\n",
+    "# Silver\n",
+    "dbutils.fs.mkdirs(f\"{silver_base_path}/gtfs_trips_enriched/\")\n",
+    "dbutils.fs.mkdirs(f\"{silver_base_path}/sptrans/vehicle_positions/\")\n",
+    "\n",
+    "# Gold\n",
+    "dbutils.fs.mkdirs(f\"{gold_base_path}/analytics/\")\n",
+    "dbutils.fs.mkdirs(f\"{gold_base_path}/mobility_intelligence/\")\n",
+    "dbutils.fs.mkdirs(f\"{gold_base_path}/route_performance/\")\n",
+    "\n",
+    "print(\"✅ Domain folders created\")\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "# ==============================\n",
+    "# VALIDATION\n",
+    "# ==============================\n",
+    "\n",
+    "print(\"🔍 Validating structure...\")\n",
+    "\n",
+    "print(\"Bronze:\")\n",
+    "display(dbutils.fs.ls(bronze_base_path))\n",
+    "\n",
+    "print(\"Silver:\")\n",
+    "display(dbutils.fs.ls(silver_base_path))\n",
+    "\n",
+    "print(\"Gold:\")\n",
+    "display(dbutils.fs.ls(gold_base_path))\n",
+    "\n",
+    "# COMMAND ----------\n",
+    "# ==============================\n",
+    "# FINAL\n",
+    "# ==============================\n",
+    "\n",
+    "print(\"🎯 Lakehouse structure created successfully!\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "application/vnd.databricks.v1+notebook": {
+   "computePreferences": null,
+   "dashboards": [],
+   "environmentMetadata": {
+    "base_environment": "",
+    "environment_version": "5"
+   },
+   "inputWidgetPreferences": null,
+   "language": "python",
+   "notebookMetadata": {
+    "pythonIndentUnit": 4
+   },
+   "notebookName": "01_create_lakehouse_structure",
+   "widgets": {}
+  },
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}
