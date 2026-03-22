@@ -73,4 +73,3 @@ try:
     spark.conf.unset(f"fs.azure.account.key.{account_fqdn}")
 except:
     pass
-
