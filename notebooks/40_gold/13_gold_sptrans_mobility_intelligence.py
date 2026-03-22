@@ -1,3 +1,6 @@
+# Databricks
+%run ../00_setup/00_config
+
 # Databricks notebook source
 
 bronze_gtfs_routes_path = "abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/gtfs/gtfs_routes"
