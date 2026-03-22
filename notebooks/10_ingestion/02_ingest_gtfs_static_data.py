@@ -1,3 +1,9 @@
+# ==============================
+# CONFIG
+# ==============================
+zip_source_path = "abfss://bronze@stspmobilitydev001.dfs.core.windows.net/gtfs/raw/cittamobi_gtfs.zip"
+zip_local_path = "/tmp/cittamobi_gtfs.zip"
+
 {
  "cells": [
   {
