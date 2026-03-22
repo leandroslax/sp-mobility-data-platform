@@ -1,22 +1,51 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/00_config
 
-spark.conf.set("spark.sql.shuffle.partitions", "8")
+# MAGIC %run /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_config
 
-storage_account = "stspmobilitydev001"
-container = "bronze"
+# COMMAND ----------
+
+from pyspark.sql.functions import current_timestamp
+
+print("🚀 Starting BRONZE GTFS processing...")
+
+# COMMAND ----------
+
+# Paths
+print("📂 Setting paths...")
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
+adls_extract_path = f"{base_path}/gtfs/extracted"
+delta_base_path = f"{base_path}/gtfs/bronze"
 
-delta_base = f"{base_path}/gtfs/delta"
-bronze_base = f"{base_path}/gtfs/bronze"
+# COMMAND ----------
 
-datasets = ["trips", "stops", "routes", "stop_times"]
+# Read data (distributed)
+print("📥 Reading GTFS files (distributed)...")
 
-for ds in datasets:
-    df = spark.read.format("delta").load(f"{delta_base}/{ds}")
+df = spark.read \
+    .option("header", True) \
+    .option("inferSchema", False) \
+    .csv(f"{adls_extract_path}/*.txt")
 
-    df.write \
-        .format("delta") \
-        .mode("append") \
-        .save(f"{bronze_base}/{ds}")
+print(f"📊 Columns: {len(df.columns)}")
+
+# COMMAND ----------
+
+# Add metadata
+print("🧠 Adding metadata...")
+
+df = df.withColumn("ingestion_time", current_timestamp())
+
+# COMMAND ----------
+
+# Write Delta (optimized)
+print("💾 Writing to BRONZE (Delta)...")
+
+df.write \
+    .format("delta") \
+    .mode("overwrite") \
+    .save(delta_base_path)
+
+# COMMAND ----------
+
+print("✅ BRONZE GTFS completed successfully!")
