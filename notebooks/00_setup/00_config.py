@@ -1,34 +1,33 @@
 # Databricks notebook source
 
-# COMMAND ----------
-
 print("⚙️ Loading global configuration...")
 
-# COMMAND ----------
-# Storage config
+# ==============================
+# ENVIRONMENT CONFIG
+# ==============================
 
-account_name = "stspmobilitydev001"
-account_fqdn = f"{account_name}.dfs.core.windows.net"
+container = "bronze"
+storage_account = "stpmobilitydev001"
 
-container_bronze = "bronze"
-container_silver = "silver"
-container_gold = "gold"
+# ==============================
+# PATHS
+# ==============================
 
-base_path_bronze = f"abfss://{container_bronze}@{account_fqdn}"
-base_path_silver = f"abfss://{container_silver}@{account_fqdn}"
-base_path_gold = f"abfss://{container_gold}@{account_fqdn}"
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-# COMMAND ----------
-# Spark performance tuning (AUTO SCALE)
+bronze_path = f"{base_path}/gtfs/bronze"
+silver_path = f"{base_path}/gtfs/silver"
+gold_path = f"{base_path}/gtfs/gold"
 
-num_cores = spark.sparkContext.defaultParallelism
+extract_path = f"{base_path}/gtfs/extracted"
 
-spark.conf.set("spark.sql.shuffle.partitions", num_cores)
+# ==============================
+# SPARK CONFIG (performance)
+# ==============================
+
+spark.conf.set("spark.sql.shuffle.partitions", "8")
 spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")
 spark.conf.set("spark.databricks.delta.autoCompact.enabled", "true")
 
-print(f"⚡ Spark tuned with {num_cores} partitions")
-
-# COMMAND ----------
-
+print("⚡ Spark tuned")
 print("✅ Config loaded successfully")
