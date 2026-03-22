@@ -3,50 +3,48 @@
 
 # COMMAND ----------
 
-print("🚀 Starting GTFS ingestion (INCREMENTAL MODE)...")
+print("🚀 Starting GTFS ingestion (FULL DISTRIBUTED MODE)...")
 
 # COMMAND ----------
 
+# PERFORMANCE CONFIG
 spark.conf.set("spark.sql.shuffle.partitions", "8")
+spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")
+spark.conf.set("spark.databricks.delta.autoCompact.enabled", "true")
 
 # COMMAND ----------
-
-from pyspark.sql.functions import current_timestamp
 
 # Paths
 storage_account = "stspmobilitydev001"
 container = "bronze"
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-
-raw_path = f"{base_path}/gtfs/raw"
-delta_base = f"{base_path}/gtfs/delta"
-checkpoint_path = f"{base_path}/gtfs/checkpoints"
+adls_extract_path = f"{base_path}/gtfs/extracted"
+delta_base_path = f"{base_path}/gtfs/delta"
 
 # COMMAND ----------
 
-print("📂 Reading new files only (Auto Loader)...")
+print("📂 Reading ALL GTFS files in parallel...")
 
-df = spark.readStream \
-    .format("cloudFiles") \
-    .option("cloudFiles.format", "csv") \
+df = spark.read \
     .option("header", True) \
-    .load(raw_path)
+    .option("inferSchema", False) \
+    .csv(f"{adls_extract_path}/*.txt")
 
 # COMMAND ----------
 
-df = df.withColumn("ingestion_time", current_timestamp())
+print("⚡ Repartitioning for max performance...")
+df = df.repartition(8)
 
 # COMMAND ----------
 
-print("💾 Writing incremental data...")
+print("💾 Writing to Delta (optimized)...")
 
-df.writeStream \
+df.write \
     .format("delta") \
-    .option("checkpointLocation", checkpoint_path) \
-    .outputMode("append") \
-    .start(delta_base)
+    .mode("overwrite") \
+    .save(delta_base_path)
 
 # COMMAND ----------
 
-print("🎯 Streaming ingestion started!")
+print("🎯 GTFS ingestion completed (FULL DISTRIBUTED 🚀)!")
