@@ -1,8 +1,6 @@
 # Databricks notebook source
 
-# Databricks notebook source
-
-# Databricks
+# COMMAND ----------
 %run ../00_setup/00_config
 
 # COMMAND ----------
@@ -12,32 +10,31 @@ print("🚀 Starting GTFS ingestion (production mode)...")
 # COMMAND ----------
 
 from pyspark.sql.functions import input_file_name
+import zipfile
+import io
+
+# COMMAND ----------
 
 # Paths
-storage_account = "stspmobilitydev001"
-container = "bronze"
+storage_account = account_name
+container = container_bronze
 
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
+base_path = f"abfss://{container}@{account_fqdn}"
 
 zip_path = f"{base_path}/gtfs/raw/cittamobi_gtfs.zip"
-extract_path = f"{base_path}/gtfs/extracted"
 delta_path = f"{base_path}/gtfs/delta"
 
 # COMMAND ----------
 
 print("📥 Reading ZIP file from ADLS...")
 
-# Spark consegue ler zip como binário
 df_binary = spark.read.format("binaryFile").load(zip_path)
 
-display(df_binary)
+print(f"Arquivos encontrados: {df_binary.count()}")
 
 # COMMAND ----------
 
-import zipfile
-import io
-
-print("📦 Extracting ZIP in distributed-friendly way...")
+print("📦 Extracting ZIP...")
 
 files = []
 
@@ -49,9 +46,11 @@ for row in df_binary.collect():
         if file_name.endswith(".txt"):
             files.append((file_name, z.read(file_name).decode("utf-8")))
 
+print(f"Total de arquivos extraídos: {len(files)}")
+
 # COMMAND ----------
 
-print("🧱 Creating Spark DataFrame...")
+print("🧱 Creating DataFrame...")
 
 df_files = spark.createDataFrame(files, ["file_name", "content"])
 
@@ -59,10 +58,10 @@ display(df_files)
 
 # COMMAND ----------
 
-print("💾 Saving raw extracted files (Bronze)...")
+print("💾 Saving Bronze Delta...")
 
 df_files.write.mode("overwrite").format("delta").save(delta_path)
 
 # COMMAND ----------
 
-print("🎯 GTFS ingestion completed (production-ready)!")
+print("✅ GTFS ingestion completed!")
