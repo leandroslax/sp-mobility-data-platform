@@ -1,26 +1,24 @@
 # Databricks notebook source
 
-# Databricks notebook source
-
-# Databricks
+# COMMAND ----------
 %run ../00_setup/00_config
 
 # COMMAND ----------
-
 print("🚀 Starting Silver GTFS processing...")
 
 # COMMAND ----------
+from pyspark.sql.functions import col
 
-storage_account = "stspmobilitydev001"
-container = "bronze"
+# Paths
+storage_account = account_name
+container = container_bronze
 
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
+base_path = f"abfss://{container}@{account_fqdn}"
 
 bronze_path = f"{base_path}/gtfs/bronze"
 silver_path = f"{base_path}/gtfs/silver"
 
 # COMMAND ----------
-
 print("📥 Reading Bronze tables...")
 
 stops = spark.read.format("delta").load(f"{bronze_path}/stops")
@@ -29,50 +27,47 @@ trips = spark.read.format("delta").load(f"{bronze_path}/trips")
 stop_times = spark.read.format("delta").load(f"{bronze_path}/stop_times")
 
 # COMMAND ----------
+print("🧹 Cleaning & casting...")
 
-from pyspark.sql.functions import col
-
-print("🧹 Cleaning & casting data...")
-
-stops_clean = (
-    stops
-    .withColumn("stop_lat", col("stop_lat").cast("double"))
+stops = stops \
+    .withColumn("stop_lat", col("stop_lat").cast("double")) \
     .withColumn("stop_lon", col("stop_lon").cast("double"))
-)
 
-routes_clean = routes
-
-trips_clean = trips
-
-stop_times_clean = (
-    stop_times
+stop_times = stop_times \
     .withColumn("stop_sequence", col("stop_sequence").cast("int"))
-)
 
 # COMMAND ----------
+print("🔗 Optimizing joins...")
 
-print("🔗 Creating enriched dataset...")
+# Broadcast small tables (performance boost)
+from pyspark.sql.functions import broadcast
 
-gtfs_enriched = (
-    stop_times_clean
-    .join(trips_clean, "trip_id", "left")
-    .join(routes_clean, "route_id", "left")
-    .join(stops_clean, "stop_id", "left")
-)
-
-display(gtfs_enriched)
+routes = broadcast(routes)
+stops = broadcast(stops)
 
 # COMMAND ----------
+print("⚙️ Building enriched dataset...")
 
-print("💾 Saving Silver tables...")
-
-stops_clean.write.mode("overwrite").format("delta").save(f"{silver_path}/stops")
-routes_clean.write.mode("overwrite").format("delta").save(f"{silver_path}/routes")
-trips_clean.write.mode("overwrite").format("delta").save(f"{silver_path}/trips")
-stop_times_clean.write.mode("overwrite").format("delta").save(f"{silver_path}/stop_times")
-
-gtfs_enriched.write.mode("overwrite").format("delta").save(f"{silver_path}/gtfs_enriched")
+gtfs_enriched = stop_times \
+    .join(trips, "trip_id", "left") \
+    .join(routes, "route_id", "left") \
+    .join(stops, "stop_id", "left")
 
 # COMMAND ----------
+print("💾 Writing Silver tables...")
 
+stops.write.mode("overwrite").format("delta").save(f"{silver_path}/stops")
+routes.write.mode("overwrite").format("delta").save(f"{silver_path}/routes")
+trips.write.mode("overwrite").format("delta").save(f"{silver_path}/trips")
+stop_times.write.mode("overwrite").format("delta").save(f"{silver_path}/stop_times")
+
+# COMMAND ----------
+print("💾 Writing enriched dataset...")
+
+gtfs_enriched.write \
+    .mode("overwrite") \
+    .format("delta") \
+    .save(f"{silver_path}/gtfs_enriched")
+
+# COMMAND ----------
 print("🎯 Silver GTFS completed!")
