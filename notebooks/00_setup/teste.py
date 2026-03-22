@@ -1,5 +1,6 @@
 # Databricks notebook source
 
+
 # COMMAND ----------
 
 print("🚀 Initializing Lakehouse structure...")
