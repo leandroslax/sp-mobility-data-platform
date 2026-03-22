@@ -5,10 +5,6 @@ from pyspark.sql.functions import current_timestamp
 
 print("🚀 Starting BRONZE GTFS processing...")
 
-print("DEBUG CONFIG:")
-print(container)
-print(storage_account)
-
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 bronze_path = f"{base_path}/gtfs/bronze"
 delta_path = f"{base_path}/gtfs/delta"
