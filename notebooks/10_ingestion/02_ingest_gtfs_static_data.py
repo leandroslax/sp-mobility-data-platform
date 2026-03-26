@@ -13,6 +13,7 @@ def _get_widget(name, default_value):
 
 import io
 import zipfile
+from pathlib import Path
 
 import requests
 from pyspark.sql.functions import current_timestamp, lit
@@ -45,15 +46,42 @@ def load_config():
 config = load_config()
 
 GTFS_DOWNLOAD_URL = "https://transitfeeds.com/p/sptrans/911/latest/download"
+LOCAL_GTFS_CANDIDATES = [
+    "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/data/raw/gtfs/cittamobi_gtfs.zip",
+    "/Workspace/Repos/leandroslax/sp-mobility-data-platform/data/raw/gtfs/cittamobi_gtfs.zip",
+]
+
+
+def load_gtfs_archive():
+    try:
+        response = requests.get(
+            GTFS_DOWNLOAD_URL,
+            timeout=(30, 180),
+            headers={"User-Agent": "Mozilla/5.0 Databricks GTFS Ingestion"},
+        )
+        response.raise_for_status()
+        print(f"Downloaded GTFS from remote source: {GTFS_DOWNLOAD_URL}")
+        return zipfile.ZipFile(io.BytesIO(response.content))
+    except requests.HTTPError as exc:
+        print(f"Remote GTFS download failed: {exc}")
+    except Exception as exc:
+        print(f"Unexpected remote GTFS error: {exc}")
+
+    for candidate in LOCAL_GTFS_CANDIDATES:
+        path = Path(candidate)
+        if path.exists():
+            print(f"Using local GTFS fallback: {candidate}")
+            return zipfile.ZipFile(path)
+
+    raise Exception(
+        "Unable to load GTFS archive from remote source or local fallback paths."
+    )
 
 print("Starting GTFS ingestion...")
 print(f"Environment: {config['env']}")
 print(f"Extract target: {config['gtfs_extract_path']}")
 
-response = requests.get(GTFS_DOWNLOAD_URL, timeout=(30, 180))
-response.raise_for_status()
-
-archive = zipfile.ZipFile(io.BytesIO(response.content))
+archive = load_gtfs_archive()
 archive_entries = sorted(archive.namelist())
 
 print(f"Archive entries found: {len(archive_entries)}")
