@@ -8,22 +8,47 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      WORKSPACE_BASE_PATH: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Databricks CLI
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install deployment dependencies
         run: |
-          pip install databricks-cli
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install databricks-cli pyyaml
+
+      - name: Validate job payloads before deploy
+        run: |
+          python -m json.tool jobs/sp_mobility_job.json > /dev/null
+          python -m json.tool jobs/sp_mobility_job_update.json > /dev/null
+
+      - name: Validate workflow YAML before deploy
+        run: |
+          python -c "import yaml, pathlib; [yaml.safe_load(path.read_text()) for path in pathlib.Path('.github/workflows').glob('*.yml')]"
 
       - name: Configure Databricks
         run: |
           databricks configure --token <<EOF2
-          ${{ secrets.DATABRICKS_HOST }}
-          ${{ secrets.DATABRICKS_TOKEN }}
+          ${{ env.DATABRICKS_HOST }}
+          ${{ env.DATABRICKS_TOKEN }}
           EOF2
 
       - name: Deploy notebooks
         run: |
-          databricks workspace import_dir notebooks /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks -o
+          databricks workspace import_dir notebooks ${{ env.WORKSPACE_BASE_PATH }}/notebooks -o
+
+      - name: Update Databricks job definition
+        run: |
+          databricks jobs reset --json @jobs/sp_mobility_job_update.json
