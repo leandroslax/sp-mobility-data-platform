@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import col, current_timestamp, explode
 
@@ -46,4 +46,3 @@ df_bronze = df_vehicles.select(
 )
 
 print(f"Bronze SPTrans rows appended to {bronze_path}")
-

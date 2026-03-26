@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import col, expr
 
@@ -32,4 +32,3 @@ geojson_df = df.select(
 )
 
 print("Map layers completed.")
-

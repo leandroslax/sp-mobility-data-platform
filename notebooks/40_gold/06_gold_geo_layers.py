@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import collect_list, col, sort_array, struct
 
@@ -30,4 +30,3 @@ routes_geo = points.groupBy("shape_id").agg(
 )
 
 print("GEO layers completed.")
-

@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql import functions as F
 
@@ -62,4 +62,3 @@ gold_mobility_df = mobility_intelligence_df.groupBy(
 )
 
 print(f"Mobility intelligence refreshed at {config['mobility_intelligence_path']}")
-

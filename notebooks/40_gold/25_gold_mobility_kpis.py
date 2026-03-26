@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql import functions as F
 
@@ -46,4 +46,3 @@ mobility_kpis_df = (
 )
 
 print(f"Mobility KPIs refreshed at {config['mobility_kpis_path']}")
-

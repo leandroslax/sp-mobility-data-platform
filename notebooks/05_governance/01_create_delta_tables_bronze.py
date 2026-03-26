@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 config = load_config()
 
@@ -13,4 +13,3 @@ for entity, path in config["gtfs_bronze_paths"].items():
         """
     )
     print(f"Registered bronze table: sp_mobility_bronze.{table_name}")
-

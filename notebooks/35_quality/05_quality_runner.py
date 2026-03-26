@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from datetime import datetime
 
@@ -32,4 +32,3 @@ if failed:
     raise Exception(f"Data Quality FAILED. Total failures: {len(failed)}")
 
 print("All data quality checks passed successfully.")
-

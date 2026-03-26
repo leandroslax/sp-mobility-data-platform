@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import col, expr
 
@@ -71,4 +71,3 @@ silver_trips_df = (
 
 print(f"Wrote silver trips to {config['gtfs_trips_enriched_path']}")
 print("SILVER GTFS completed.")
-

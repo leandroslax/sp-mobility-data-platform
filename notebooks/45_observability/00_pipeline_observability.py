@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 config = load_config()
 
@@ -65,4 +65,3 @@ spark.sql(
 )
 
 print("Observability catalog registration completed.")
-

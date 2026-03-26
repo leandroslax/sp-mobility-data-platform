@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 import io
 import zipfile
@@ -55,4 +55,3 @@ print("GTFS ingestion completed.")
 
 for entity, target_path in processed_entities:
     print(f"OK: {entity} -> {target_path}")
-

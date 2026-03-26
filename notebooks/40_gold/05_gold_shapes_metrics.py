@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import col, max
 
@@ -23,4 +23,3 @@ routes = (
 )
 
 print("GOLD shapes metrics completed.")
-

@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ./config
+# MAGIC %run "./config"
 
 config = load_config()
 
@@ -26,4 +26,3 @@ for path in paths_to_create:
     print(f"OK: {path}")
 
 print("Lakehouse structure created successfully.")
-

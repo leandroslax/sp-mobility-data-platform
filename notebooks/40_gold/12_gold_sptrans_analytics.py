@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import avg, countDistinct
 
@@ -37,4 +37,3 @@ df_gold_geo = df_silver.groupBy("line_code", "line_name").agg(
 )
 
 print(f"Gold SPTrans analytics refreshed at {gold_path}")
-

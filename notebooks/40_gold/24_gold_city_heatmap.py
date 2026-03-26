@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql import functions as F
 
@@ -42,4 +42,3 @@ city_heatmap_df = (
 )
 
 print(f"City heatmap refreshed at {config['city_heatmap_path']}")
-

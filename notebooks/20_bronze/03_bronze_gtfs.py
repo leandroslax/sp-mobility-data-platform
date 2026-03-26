@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import current_timestamp
 
@@ -34,4 +34,3 @@ for entity, bronze_target in config["gtfs_bronze_paths"].items():
     print(f"Wrote bronze dataset: {entity} -> {bronze_target}")
 
 print("BRONZE GTFS completed.")
-

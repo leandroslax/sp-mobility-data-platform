@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 config = load_config()
 
@@ -43,4 +43,3 @@ datasets = {
 for name, df in datasets.items():
     df.createOrReplaceTempView(name)
     print(f"Temp view ready: {name}")
-

@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql.functions import col, hour, to_date
 
@@ -29,4 +29,3 @@ df_silver = (
 )
 
 print(f"Silver SPTrans dataset refreshed at {silver_path}")
-

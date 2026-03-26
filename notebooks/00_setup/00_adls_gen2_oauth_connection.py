@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ./config
+# MAGIC %run "./config"
 
 config = load_config()
 
@@ -38,4 +38,3 @@ spark.conf.set(
 )
 
 print(f"OAuth configured for {config['account_fqdn']}")
-

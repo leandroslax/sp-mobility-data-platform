@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql import functions as F
 
@@ -38,4 +38,3 @@ city_activity_df = (
 )
 
 print(f"City activity refreshed at {config['city_activity_path']}")
-

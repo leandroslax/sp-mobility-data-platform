@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 import json
 from datetime import datetime
@@ -42,4 +42,3 @@ target_file = f"{landing_path}/sptrans_vehicle_positions_{capture_ts}.json"
 dbutils.fs.cp(f"file:{local_file}", target_file, True)
 
 print(f"SPTrans snapshot saved to {target_file}")
-

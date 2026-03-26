@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
+# MAGIC %run "../00_setup/config"
 
 from pyspark.sql import functions as F
 
@@ -30,4 +30,3 @@ route_performance_df = (
 )
 
 print(f"Route performance refreshed at {config['route_performance_path']}")
-
