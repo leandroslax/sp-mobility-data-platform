@@ -271,6 +271,31 @@ Artefatos relacionados:
 - [governance/quality/data_quality_rules.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/quality/data_quality_rules.md)
 - [governance/data_contracts/vehicle_positions_contract.yaml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/data_contracts/vehicle_positions_contract.yaml)
 
+## Analytics / BI
+
+O projeto já possui uma camada analítica pronta para consumo, construída sobre os datasets Gold e preparada para alimentar dashboards operacionais.
+
+Datasets analíticos atualmente utilizados:
+
+- `gold_mobility_kpis` para KPIs e série temporal por hora
+- `gold_route_performance` para ranking e análise por linha
+- `gold_city_heatmap` para visualização geográfica por grid
+
+Artefatos relacionados:
+
+- [00_sql_dashboard_queries.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/50_analytics/00_sql_dashboard_queries.py)
+- [08_sql_dashboard_queries.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/50_analytics/08_sql_dashboard_queries.py)
+- [25_gold_mobility_kpis.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis.py)
+- [22_gold_route_performance.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance.py)
+- [24_gold_city_heatmap.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap.py)
+
+Status atual da camada de consumo:
+
+- datasets Gold validados e consultáveis no cluster Databricks
+- queries analíticas organizadas em notebook dedicado
+- export dos datasets principais preparado para consumo em ferramenta de BI externa
+- dashboard operacional em construção com foco em KPIs, rotas e distribuição espacial
+
 ## Governança
 
 O projeto inclui artefatos de governança além da simples implementação técnica.
@@ -334,7 +359,7 @@ Próxima fase recomendada:
 
 - adicionar smoke tests pós-deploy no Databricks
 - separar job definitions por ambiente
-- criar release/tag `v1.0.0`
+- consolidar o dashboard final em ferramenta de BI
 - adicionar screenshots finais ao `README`
 - revisar o About e os tópicos do repositório
 
@@ -392,7 +417,7 @@ O problema foi mitigado ao substituir `job_cluster` efêmero pelo cluster existe
 
 Para fechar a primeira release do projeto com acabamento de portfólio, os próximos passos recomendados são:
 
-- criar a release/tag `v1.0.0`
+- consolidar o dashboard final em ferramenta de BI
 - adicionar screenshots finais ao `README`
 - revisar o About e os tópicos do repositório
 - adicionar smoke tests pós-deploy no Databricks

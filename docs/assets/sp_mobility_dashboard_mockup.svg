@@ -1,0 +1,144 @@
+<svg width="1600" height="980" viewBox="0 0 1600 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="980" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1722"/>
+      <stop offset="1" stop-color="#10263A"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#13283C"/>
+      <stop offset="1" stop-color="#0F2132"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#15B6A6"/>
+      <stop offset="1" stop-color="#78E3B7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#05101A" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="980" fill="url(#bg)"/>
+
+  <text x="70" y="82" fill="#F4F7FA" font-size="34" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    SP Mobility Operational Dashboard
+  </text>
+  <text x="70" y="114" fill="#93A8BC" font-size="18" font-family="Arial, Helvetica, sans-serif">
+    Databricks Gold Layer | Mobility KPIs, Route Performance, City Activity and Heatmap
+  </text>
+
+  <rect x="1220" y="52" rx="16" ry="16" width="300" height="44" fill="#12293C" stroke="#284861"/>
+  <text x="1245" y="80" fill="#C7D5E3" font-size="16" font-family="Arial, Helvetica, sans-serif">Last refresh: 2026-03-26 17:00</text>
+
+  <!-- KPI cards -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="150" rx="22" ry="22" width="350" height="138" fill="url(#panel)" stroke="#27445B"/>
+    <rect x="430" y="150" rx="22" ry="22" width="350" height="138" fill="url(#panel)" stroke="#27445B"/>
+    <rect x="800" y="150" rx="22" ry="22" width="350" height="138" fill="url(#panel)" stroke="#27445B"/>
+    <rect x="1170" y="150" rx="22" ry="22" width="350" height="138" fill="url(#panel)" stroke="#27445B"/>
+  </g>
+
+  <rect x="82" y="172" rx="8" ry="8" width="118" height="10" fill="url(#accent)"/>
+  <text x="82" y="212" fill="#9AB0C4" font-size="18" font-family="Arial, Helvetica, sans-serif">Total Vehicles</text>
+  <text x="82" y="260" fill="#FFFFFF" font-size="46" font-family="Arial, Helvetica, sans-serif" font-weight="700">10,767</text>
+  <text x="82" y="285" fill="#7FE0BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Latest operational snapshot</text>
+
+  <rect x="452" y="172" rx="8" ry="8" width="118" height="10" fill="url(#accent)"/>
+  <text x="452" y="212" fill="#9AB0C4" font-size="18" font-family="Arial, Helvetica, sans-serif">Active Lines</text>
+  <text x="452" y="260" fill="#FFFFFF" font-size="46" font-family="Arial, Helvetica, sans-serif" font-weight="700">1,074</text>
+  <text x="452" y="285" fill="#7FE0BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Distinct line activity detected</text>
+
+  <rect x="822" y="172" rx="8" ry="8" width="118" height="10" fill="url(#accent)"/>
+  <text x="822" y="212" fill="#9AB0C4" font-size="18" font-family="Arial, Helvetica, sans-serif">Total Positions</text>
+  <text x="822" y="260" fill="#FFFFFF" font-size="46" font-family="Arial, Helvetica, sans-serif" font-weight="700">10,767</text>
+  <text x="822" y="285" fill="#7FE0BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Vehicle GPS records processed</text>
+
+  <rect x="1192" y="172" rx="8" ry="8" width="118" height="10" fill="url(#accent)"/>
+  <text x="1192" y="212" fill="#9AB0C4" font-size="18" font-family="Arial, Helvetica, sans-serif">Accessibility Rate</text>
+  <text x="1192" y="260" fill="#FFFFFF" font-size="46" font-family="Arial, Helvetica, sans-serif" font-weight="700">99.92%</text>
+  <text x="1192" y="285" fill="#7FE0BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Accessible position share</text>
+
+  <!-- Trend panel -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="322" rx="24" ry="24" width="930" height="300" fill="url(#panel)" stroke="#27445B"/>
+  </g>
+  <text x="88" y="362" fill="#F2F7FC" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Hourly Mobility Trend</text>
+  <text x="88" y="390" fill="#8FA7BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Evolution of vehicles, active lines and positions by hour</text>
+
+  <line x1="120" y1="565" x2="950" y2="565" stroke="#39556E" stroke-width="2"/>
+  <line x1="120" y1="435" x2="120" y2="565" stroke="#39556E" stroke-width="2"/>
+  <polyline points="130,520 220,500 310,490 400,470 490,455 580,430 670,410 760,385 850,360 940,340" fill="none" stroke="#19B4A7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="130,540 220,530 310,520 400,505 490,495 580,480 670,462 760,440 850,420 940,400" fill="none" stroke="#E3C86B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="130,552 220,547 310,540 400,530 490,520 580,510 670,495 760,480 850,465 940,445" fill="none" stroke="#7CD8C3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="850" cy="420" r="6" fill="#E3C86B"/>
+  <circle cx="850" cy="360" r="7" fill="#19B4A7"/>
+  <text x="810" y="336" fill="#F8FBFD" font-size="14" font-family="Arial, Helvetica, sans-serif">Vehicles peak</text>
+  <text x="130" y="590" fill="#8FA7BB" font-size="14" font-family="Arial, Helvetica, sans-serif">06h</text>
+  <text x="300" y="590" fill="#8FA7BB" font-size="14" font-family="Arial, Helvetica, sans-serif">09h</text>
+  <text x="470" y="590" fill="#8FA7BB" font-size="14" font-family="Arial, Helvetica, sans-serif">12h</text>
+  <text x="640" y="590" fill="#8FA7BB" font-size="14" font-family="Arial, Helvetica, sans-serif">15h</text>
+  <text x="810" y="590" fill="#8FA7BB" font-size="14" font-family="Arial, Helvetica, sans-serif">18h</text>
+  <text x="878" y="438" fill="#E3C86B" font-size="14" font-family="Arial, Helvetica, sans-serif">Active lines</text>
+  <text x="878" y="364" fill="#19B4A7" font-size="14" font-family="Arial, Helvetica, sans-serif">Total vehicles</text>
+  <text x="878" y="456" fill="#7CD8C3" font-size="14" font-family="Arial, Helvetica, sans-serif">Positions</text>
+
+  <!-- Top routes -->
+  <g filter="url(#shadow)">
+    <rect x="1020" y="322" rx="24" ry="24" width="500" height="300" fill="url(#panel)" stroke="#27445B"/>
+  </g>
+  <text x="1048" y="362" fill="#F2F7FC" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Top Routes by Active Vehicles</text>
+  <text x="1048" y="390" fill="#8FA7BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Operational concentration by line code</text>
+
+  <text x="1050" y="445" fill="#BFD0DE" font-size="16" font-family="Arial, Helvetica, sans-serif">875A</text>
+  <rect x="1110" y="425" width="330" height="22" rx="11" fill="#20394D"/>
+  <rect x="1110" y="425" width="280" height="22" rx="11" fill="#14B6A5"/>
+
+  <text x="1050" y="488" fill="#BFD0DE" font-size="16" font-family="Arial, Helvetica, sans-serif">4310</text>
+  <rect x="1110" y="468" width="330" height="22" rx="11" fill="#20394D"/>
+  <rect x="1110" y="468" width="245" height="22" rx="11" fill="#21C0AE"/>
+
+  <text x="1050" y="531" fill="#BFD0DE" font-size="16" font-family="Arial, Helvetica, sans-serif">809P</text>
+  <rect x="1110" y="511" width="330" height="22" rx="11" fill="#20394D"/>
+  <rect x="1110" y="511" width="210" height="22" rx="11" fill="#42CAB5"/>
+
+  <text x="1050" y="574" fill="#BFD0DE" font-size="16" font-family="Arial, Helvetica, sans-serif">5106</text>
+  <rect x="1110" y="554" width="330" height="22" rx="11" fill="#20394D"/>
+  <rect x="1110" y="554" width="180" height="22" rx="11" fill="#5DD5BC"/>
+
+  <!-- Heatmap -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="656" rx="24" ry="24" width="930" height="270" fill="url(#panel)" stroke="#27445B"/>
+  </g>
+  <text x="88" y="696" fill="#F2F7FC" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">City Activity Heatmap</text>
+  <text x="88" y="724" fill="#8FA7BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Spatial density of active vehicles across Sao Paulo grid cells</text>
+  <rect x="96" y="750" width="860" height="140" rx="18" fill="#0C1A28" stroke="#22384B"/>
+  <circle cx="250" cy="815" r="16" fill="#0DC0A7"/>
+  <circle cx="330" cy="790" r="22" fill="#31CDB3"/>
+  <circle cx="395" cy="835" r="18" fill="#5BDFC0"/>
+  <circle cx="470" cy="802" r="24" fill="#F2B55E"/>
+  <circle cx="560" cy="770" r="28" fill="#FF8B4A"/>
+  <circle cx="625" cy="825" r="20" fill="#19B4A7"/>
+  <circle cx="715" cy="792" r="26" fill="#FF6A3D"/>
+  <circle cx="790" cy="840" r="14" fill="#76E2C6"/>
+  <circle cx="870" cy="798" r="18" fill="#27C5AF"/>
+  <path d="M120 865 C240 760, 350 880, 470 805 S720 770, 910 845" stroke="#42637B" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Route type -->
+  <g filter="url(#shadow)">
+    <rect x="1020" y="656" rx="24" ry="24" width="500" height="270" fill="url(#panel)" stroke="#27445B"/>
+  </g>
+  <text x="1048" y="696" fill="#F2F7FC" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="700">Route Type Distribution</text>
+  <text x="1048" y="724" fill="#8FA7BB" font-size="16" font-family="Arial, Helvetica, sans-serif">Composition of route activity in the current snapshot</text>
+  <circle cx="1185" cy="815" r="82" fill="#0E1F2D"/>
+  <path d="M1185 733 A82 82 0 0 1 1262 789 L1185 815 Z" fill="#16B7A7"/>
+  <path d="M1262 789 A82 82 0 0 1 1158 892 L1185 815 Z" fill="#7CD8C3"/>
+  <path d="M1158 892 A82 82 0 0 1 1108 765 L1185 815 Z" fill="#E3C86B"/>
+  <path d="M1108 765 A82 82 0 0 1 1185 733 L1185 815 Z" fill="#F08C4A"/>
+  <text x="1290" y="776" fill="#D6E3EC" font-size="15" font-family="Arial, Helvetica, sans-serif">Bus trunk</text>
+  <rect x="1260" y="764" width="18" height="18" rx="4" fill="#16B7A7"/>
+  <text x="1290" y="810" fill="#D6E3EC" font-size="15" font-family="Arial, Helvetica, sans-serif">Feeder</text>
+  <rect x="1260" y="798" width="18" height="18" rx="4" fill="#7CD8C3"/>
+  <text x="1290" y="844" fill="#D6E3EC" font-size="15" font-family="Arial, Helvetica, sans-serif">Circular</text>
+  <rect x="1260" y="832" width="18" height="18" rx="4" fill="#E3C86B"/>
+  <text x="1290" y="878" fill="#D6E3EC" font-size="15" font-family="Arial, Helvetica, sans-serif">Interdistrict</text>
+  <rect x="1260" y="866" width="18" height="18" rx="4" fill="#F08C4A"/>
+</svg>
