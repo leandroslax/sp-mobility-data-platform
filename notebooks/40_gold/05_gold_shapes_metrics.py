@@ -9,46 +9,43 @@ storage_account = "stspmobilitydev001"
 
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-gold_path = f"{base_path}/gtfs/gold"
+silver_path = f"{base_path}/gtfs/silver"
+gold_path   = f"{base_path}/gtfs/gold"
 
 # ==========================================
 # IMPORTS
 # ==========================================
 
-from pyspark.sql.functions import col, expr
+from pyspark.sql.functions import col, max
 
-print("🗺️ Starting MAP LAYERS (GEOJSON)...")
-
-# ==========================================
-# READ GEO ROUTES
-# ==========================================
-
-df = spark.read.format("delta").load(f"{gold_path}/geo_routes")
+print("🚀 Starting GOLD SHAPES METRICS...")
 
 # ==========================================
-# GEOJSON
+# READ SILVER
 # ==========================================
 
-geojson_df = df.select(
-    col("shape_id"),
-    expr("""
-        to_json(
-            named_struct(
-                'type', 'LineString',
-                'coordinates',
-                transform(points, p -> array(p.shape_pt_lon, p.shape_pt_lat))
-            )
-        )
-    """).alias("geojson")
+df = spark.read.format("delta").load(f"{silver_path}/shapes")
+
+# ==========================================
+# CALCULAR DISTÂNCIA
+# ==========================================
+
+routes = (
+    df.groupBy("shape_id")
+    .agg(
+        max("shape_dist_traveled").alias("total_distance")
+    )
 )
+
+routes = routes.orderBy(col("total_distance").desc())
 
 # ==========================================
 # WRITE GOLD
 # ==========================================
 
-geojson_df.write \
+routes.write \
     .format("delta") \
     .mode("overwrite") \
-    .save(f"{gold_path}/geojson_routes")
+    .save(f"{gold_path}/routes_distance")
 
-print("✅ GEOJSON completed!")
+print("✅ GOLD METRICS completed!")

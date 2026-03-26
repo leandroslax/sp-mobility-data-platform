@@ -1,5 +1,4 @@
 # Databricks notebook source
-# Databricks notebook source
 
 # ==========================================
 # CONFIG
@@ -11,7 +10,7 @@ storage_account = "stspmobilitydev001"
 base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
 silver_path = f"{base_path}/gtfs/silver"
-gold_path = f"{base_path}/gtfs/gold"
+gold_path   = f"{base_path}/gtfs/gold"
 
 # ==========================================
 # IMPORTS
@@ -22,16 +21,14 @@ from pyspark.sql.functions import col, collect_list, struct, sort_array
 print("🗺️ Starting GEO LAYERS processing...")
 
 # ==========================================
-# READ SILVER SHAPES
+# READ SILVER
 # ==========================================
 
 df = spark.read.format("delta").load(f"{silver_path}/shapes")
 
 # ==========================================
-# GARANTIR ORDEM DOS PONTOS
+# ORGANIZAR PONTOS
 # ==========================================
-
-print("📍 Organizando pontos por sequência...")
 
 points = (
     df.select(
@@ -45,27 +42,14 @@ points = (
 )
 
 # ==========================================
-# AGRUPAR EM LINHAS (ROTAS)
+# AGRUPAR EM LINHAS
 # ==========================================
-
-print("🧩 Construindo rotas (linhas)...")
 
 routes_geo = (
     points.groupBy("shape_id")
     .agg(
         sort_array(collect_list("point")).alias("points")
     )
-)
-
-# ==========================================
-# SIMPLIFICAR ESTRUTURA
-# ==========================================
-
-print("🔧 Transformando para formato geo...")
-
-routes_geo = routes_geo.select(
-    col("shape_id"),
-    col("points")
 )
 
 # ==========================================
