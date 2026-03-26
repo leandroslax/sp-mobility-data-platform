@@ -1,6 +1,8 @@
 # Databricks notebook source
 # MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
+# COMMAND ----------
+
 from pyspark.sql.functions import collect_list, col, sort_array, struct
 
 config = load_config()

@@ -1,6 +1,8 @@
 # Databricks notebook source
 # MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
+# COMMAND ----------
+
 config = load_config()
 
 print("Registering databases and tables in Hive Metastore...")

@@ -1,6 +1,8 @@
 # Databricks notebook source
 # MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
+# COMMAND ----------
+
 from pyspark.sql.functions import avg, countDistinct
 
 config = load_config()
