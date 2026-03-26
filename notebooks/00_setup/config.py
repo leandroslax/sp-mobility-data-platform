@@ -40,7 +40,7 @@ def load_config():
 
     repo_base_path = _get_widget(
         "repo_base_path",
-        "/Workspace/Repos/leandroslax/sp-mobility-data-platform",
+        "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform",
     )
     user_workspace_path = _get_widget(
         "user_workspace_path",
@@ -105,12 +105,12 @@ def load_config():
             for entity, table_name in gtfs_entities.items()
         },
         "workspace_notebooks": {
-            "quality_runner": f"{repo_base_path}/notebooks/35_quality/05_quality_runner.py",
+            "quality_runner": f"{user_workspace_path}/notebooks/35_quality/05_quality_runner",
             "quality_checks": [
-                f"{repo_base_path}/notebooks/35_quality/01_quality_silver_sptrans_vehicle_positions.py",
-                f"{repo_base_path}/notebooks/35_quality/02_quality_silver_gtfs_trips_enriched.py",
-                f"{repo_base_path}/notebooks/35_quality/03_quality_gold_city_activity.py",
-                f"{repo_base_path}/notebooks/35_quality/04_quality_gold_mobility_kpis.py",
+                f"{user_workspace_path}/notebooks/35_quality/01_quality_silver_sptrans_vehicle_positions",
+                f"{user_workspace_path}/notebooks/35_quality/02_quality_silver_gtfs_trips_enriched",
+                f"{user_workspace_path}/notebooks/35_quality/03_quality_gold_city_activity",
+                f"{user_workspace_path}/notebooks/35_quality/04_quality_gold_mobility_kpis",
             ],
         },
     }
