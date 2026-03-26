@@ -1,63 +1,74 @@
 # Databricks notebook source
-# ==========================================
-# BRONZE - GTFS PROCESSING
-# ==========================================
-
-# 🔧 Importa configurações centralizadas
-%run ../00_setup/00_config
 
 from pyspark.sql.functions import current_timestamp
 
-print("🚀 Starting BRONZE GTFS processing...")
 
-# ==========================================
-# PATHS
-# ==========================================
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
 
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
-# camada delta (gerada no ingestion)
-delta_path = f"{base_path}/gtfs/delta"
+def load_config():
+    storage_account = _get_widget("storage_account", "stspmobilitydev001")
+    landing_root = f"abfss://landing@{storage_account}.dfs.core.windows.net"
+    bronze_root = f"abfss://bronze@{storage_account}.dfs.core.windows.net"
+    gtfs_entities = {
+        "agency": "gtfs_agency",
+        "calendar": "gtfs_calendar",
+        "calendar_dates": "gtfs_calendar_dates",
+        "feed_info": "gtfs_feed_info",
+        "routes": "gtfs_routes",
+        "shapes": "gtfs_shapes",
+        "stop_times": "gtfs_stop_times",
+        "stops": "gtfs_stops",
+        "trips": "gtfs_trips",
+    }
+    return {
+        "gtfs_extract_paths": {
+            entity: f"{landing_root}/gtfs/extracted/{entity}"
+            for entity in gtfs_entities
+        },
+        "gtfs_bronze_paths": {
+            entity: f"{bronze_root}/{table_name}"
+            for entity, table_name in gtfs_entities.items()
+        },
+    }
 
-# camada bronze (destino)
-bronze_path = f"{base_path}/gtfs/bronze"
+config = load_config()
 
-print(f"📥 Reading from: {delta_path}")
-print(f"📤 Writing to: {bronze_path}")
+spark.conf.set("spark.sql.shuffle.partitions", "8")
+spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")
+spark.conf.set("spark.databricks.delta.autoCompact.enabled", "true")
 
-# ==========================================
-# READ DELTA (INGESTION OUTPUT)
-# ==========================================
+print("Starting BRONZE GTFS processing...")
 
-df = spark.read.format("delta").load(delta_path)
+for entity, bronze_target in config["gtfs_bronze_paths"].items():
+    source_path = config["gtfs_extract_paths"][entity]
 
-print("✅ Data loaded successfully")
+    try:
+        df = spark.read.format("delta").load(source_path)
+    except Exception as exc:
+        print(f"Skipping {entity}: could not read {source_path} ({exc})")
+        continue
 
-# ==========================================
-# TRANSFORMAÇÃO (BRONZE)
-# ==========================================
+    row_count = df.count()
+    print(f"Loaded {entity}: {row_count} rows")
 
-df_bronze = df.withColumn("ingestion_time", current_timestamp())
+    (
+        df.withColumn("bronze_loaded_at", current_timestamp())
+        .write.format("delta")
+        .mode("overwrite")
+        .option("overwriteSchema", "true")
+        .save(bronze_target)
+    )
 
-# ==========================================
-# WRITE BRONZE
-# ==========================================
+    print(f"Wrote bronze dataset: {entity} -> {bronze_target}")
 
-df_bronze.write \
-    .format("delta") \
-    .mode("overwrite") \
-    .save(bronze_path)
-
-print("✅ BRONZE layer completed successfully!")
-
-# ==========================================
-# DEBUG / VALIDATION
-# ==========================================
-
-print("🔎 Validating written data...")
-
-df_check = spark.read.format("delta").load(bronze_path)
-
-print(f"📊 Total records in bronze: {df_check.count()}")
-
-display(df_check.limit(10))
+print("BRONZE GTFS completed.")

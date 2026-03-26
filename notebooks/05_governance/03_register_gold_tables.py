@@ -1,119 +1,45 @@
 # Databricks notebook source
 
-# Databricks notebook source
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
 
-# Databricks
-%run ../00_setup/00_config
 
-# Databricks notebook source
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 0,
-   "metadata": {
-    "application/vnd.databricks.v1+cell": {
-     "cellMetadata": {},
-     "inputWidgets": {},
-     "nuid": "8214a029-dabc-4dc2-bbbf-19ea89409229",
-     "showTitle": false,
-     "tableResultSettingsMap": {},
-     "title": ""
+def load_config():
+    storage_account = _get_widget("storage_account", "stspmobilitydev001")
+    gold_root = f"abfss://gold@{storage_account}.dfs.core.windows.net"
+    return {
+        "gold_root": gold_root,
+        "route_performance_path": f"{gold_root}/route_performance",
+        "mobility_kpis_path": f"{gold_root}/mobility_kpis",
+        "city_activity_path": f"{gold_root}/city_activity",
+        "city_heatmap_path": f"{gold_root}/map/city_heatmap",
+        "mobility_intelligence_path": f"{gold_root}/mobility/intelligence",
     }
-   },
-   "outputs": [],
-   "source": [
-    "\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"🚀 Registering Gold tables...\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.mobility_kpis\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/mobility_kpis'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"✅ Table registered: sp_mobility_gold.mobility_kpis\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.city_activity\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/city_activity'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"✅ Table registered: sp_mobility_gold.city_activity\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.route_performance\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/route_performance'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"✅ Table registered: sp_mobility_gold.route_performance\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.city_heatmap\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/city_heatmap'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"✅ Table registered: sp_mobility_gold.city_heatmap\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.mobility_intelligence\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/mobility_intelligence'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"✅ Table registered: sp_mobility_gold.mobility_intelligence\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"📊 Validating Gold tables...\")\n",
-    "spark.sql(\"SHOW TABLES IN sp_mobility_gold\").show(truncate=False)\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "display(spark.table(\"sp_mobility_gold.route_performance\").limit(10))\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"🎯 Gold table registration completed successfully!\")"
-   ]
-  }
- ],
- "metadata": {
-  "application/vnd.databricks.v1+notebook": {
-   "computePreferences": null,
-   "dashboards": [],
-   "environmentMetadata": {
-    "base_environment": "",
-    "environment_version": "4"
-   },
-   "inputWidgetPreferences": null,
-   "language": "python",
-   "notebookMetadata": {
-    "pythonIndentUnit": 4
-   },
-   "notebookName": "03_register_gold_tables",
-   "widgets": {}
-  },
-  "language_info": {
-   "name": "python"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 0
+
+config = load_config()
+
+gold_tables = {
+    "mobility_kpis": config["mobility_kpis_path"],
+    "city_activity": f"{config['gold_root']}/city_activity",
+    "route_performance": config["route_performance_path"],
+    "city_heatmap": f"{config['gold_root']}/map/city_heatmap",
+    "mobility_intelligence": f"{config['gold_root']}/mobility/intelligence",
 }
+
+for table_name, path in gold_tables.items():
+    spark.sql(
+        f"""
+        CREATE TABLE IF NOT EXISTS sp_mobility_gold.{table_name}
+        USING DELTA
+        LOCATION '{path}'
+        """
+    )
+    print(f"Registered gold table: sp_mobility_gold.{table_name}")

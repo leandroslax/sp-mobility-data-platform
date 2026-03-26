@@ -1,0 +1,116 @@
+name: CD - Deploy to Databricks
+
+"on":
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - "notebooks/**"
+      - "jobs/**"
+      - "workflows/**"
+      - ".github/workflows/cd.yml"
+      - "requirements-dev.txt"
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Target environment for deployment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - prod
+      deploy_job_definition:
+        description: "Also update the Databricks job definition"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-databricks-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_environment || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_environment || (github.ref_name == 'main' && 'prod' || 'dev') }}
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      DATABRICKS_WORKSPACE_BASE_PATH: ${{ secrets.DATABRICKS_WORKSPACE_BASE_PATH }}
+      DEPLOY_JOB_DEFINITION: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_job_definition || 'true' }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "requirements-dev.txt"
+
+      - name: Install deployment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install databricks-cli pyyaml
+
+      - name: Resolve deployment context
+        run: |
+          echo "Git ref: $GITHUB_REF"
+          echo "Git ref name: $GITHUB_REF_NAME"
+          echo "Deploy job definition: $DEPLOY_JOB_DEFINITION"
+
+      - name: Validate required deployment secrets
+        run: |
+          test -n "$DATABRICKS_HOST" || (echo "Missing DATABRICKS_HOST secret" && exit 1)
+          test -n "$DATABRICKS_TOKEN" || (echo "Missing DATABRICKS_TOKEN secret" && exit 1)
+          test -n "$DATABRICKS_WORKSPACE_BASE_PATH" || (echo "Missing DATABRICKS_WORKSPACE_BASE_PATH secret" && exit 1)
+
+      - name: Validate job payloads before deploy
+        run: |
+          python -m json.tool jobs/sp_mobility_job.json > /dev/null
+          python -m json.tool jobs/sp_mobility_job_update.json > /dev/null
+
+      - name: Validate workflow YAML before deploy
+        run: |
+          python -c "import yaml, pathlib; [yaml.safe_load(path.read_text()) for path in pathlib.Path('.github/workflows').glob('*.yml')]"
+
+      - name: Configure Databricks
+        run: |
+          databricks configure --token <<EOF2
+          ${{ env.DATABRICKS_HOST }}
+          ${{ env.DATABRICKS_TOKEN }}
+          EOF2
+
+      - name: Deploy notebooks
+        run: |
+          databricks workspace import_dir notebooks ${{ env.DATABRICKS_WORKSPACE_BASE_PATH }}/notebooks -o
+
+      - name: Update Databricks job definition
+        if: env.DEPLOY_JOB_DEFINITION == 'true'
+        run: |
+          databricks jobs reset --json @jobs/sp_mobility_job_update.json
+
+      - name: Verify Databricks job definition
+        if: env.DEPLOY_JOB_DEFINITION == 'true'
+        run: |
+          JOB_ID=$(python -c "import json; print(json.load(open('jobs/sp_mobility_job_update.json'))['job_id'])")
+          databricks jobs get "$JOB_ID" > /dev/null
+
+      - name: Publish deployment summary
+        run: |
+          {
+            echo "## Databricks deployment summary"
+            echo ""
+            echo "- Environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_environment || (github.ref_name == 'main' && 'prod' || 'dev') }}"
+            echo "- Workspace base path: $DATABRICKS_WORKSPACE_BASE_PATH"
+            echo "- Job definition updated: $DEPLOY_JOB_DEFINITION"
+            echo "- Source ref: $GITHUB_REF_NAME"
+          } >> "$GITHUB_STEP_SUMMARY"

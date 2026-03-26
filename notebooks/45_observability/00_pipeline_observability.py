@@ -1,163 +1,69 @@
 # Databricks notebook source
+# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
-# Databricks notebook source
+# COMMAND ----------
 
-# Databricks
-%run ../00_setup/00_config
+config = load_config()
 
-# Databricks notebook source
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 0,
-   "metadata": {
-    "application/vnd.databricks.v1+cell": {
-     "cellMetadata": {
-      "byteLimit": 2048000,
-      "rowLimit": 10000
-     },
-     "inputWidgets": {},
-     "nuid": "237cfdc8-a059-4304-bc6e-8b1706d0354f",
-     "showTitle": false,
-     "tableResultSettingsMap": {},
-     "title": ""
-    }
-   },
-   "outputs": [],
-   "source": [
-    "\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"Iniciando registro de databases e tabelas no Hive Metastore...\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_bronze\n",
-    "LOCATION 'abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_silver\n",
-    "LOCATION 'abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_gold\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_audit\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/audit/'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_quality\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/quality/'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"Databases registrados com sucesso\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "# Bronze\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_bronze.gps\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/gps'\n",
-    "\"\"\")\n",
-    "\n",
-    "# Silver\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_silver.gtfs_trips_enriched\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/gtfs_trips_enriched'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_silver.sptrans_vehicle_positions\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions'\n",
-    "\"\"\")\n",
-    "\n",
-    "# Gold\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.city_activity\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/city_activity'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.route_performance\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/route_performance'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_gold.mobility_kpis\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/mobility_kpis'\n",
-    "\"\"\")\n",
-    "\n",
-    "# Audit\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE TABLE IF NOT EXISTS sp_mobility_audit.pipeline_runs\n",
-    "USING DELTA\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/audit/pipeline_runs'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"Tabelas registradas com sucesso\")\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"Databases disponíveis:\")\n",
-    "spark.sql(\"SHOW DATABASES\").show(truncate=False)\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"Tabelas Bronze:\")\n",
-    "spark.sql(\"SHOW TABLES IN sp_mobility_bronze\").show(truncate=False)\n",
-    "\n",
-    "print(\"Tabelas Silver:\")\n",
-    "spark.sql(\"SHOW TABLES IN sp_mobility_silver\").show(truncate=False)\n",
-    "\n",
-    "print(\"Tabelas Gold:\")\n",
-    "spark.sql(\"SHOW TABLES IN sp_mobility_gold\").show(truncate=False)\n",
-    "\n",
-    "print(\"Tabelas Audit:\")\n",
-    "spark.sql(\"SHOW TABLES IN sp_mobility_audit\").show(truncate=False)\n",
-    "\n",
-    "# COMMAND ----------\n",
-    "\n",
-    "print(\"Governance/catalog registration finalizado com sucesso\")\n",
-    "\n",
-    "dbutils.notebook.exit(\"SUCCESS\")"
-   ]
-  }
- ],
- "metadata": {
-  "application/vnd.databricks.v1+notebook": {
-   "computePreferences": null,
-   "dashboards": [],
-   "environmentMetadata": {
-    "base_environment": "",
-    "environment_version": "4"
-   },
-   "inputWidgetPreferences": null,
-   "language": "python",
-   "notebookMetadata": {
-    "pythonIndentUnit": 4
-   },
-   "notebookName": "00_governance_catalog_registration",
-   "widgets": {}
-  },
-  "language_info": {
-   "name": "python"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 0
-}
+print("Registering databases and tables in Hive Metastore...")
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_bronze
+    LOCATION '{config["bronze_root"]}/'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_silver
+    LOCATION '{config["silver_root"]}/'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_gold
+    LOCATION '{config["gold_root"]}/'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_audit
+    LOCATION '{config["gold_root"]}/audit/'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_quality
+    LOCATION '{config["quality_path"]}/'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE TABLE IF NOT EXISTS sp_mobility_silver.sptrans_vehicle_positions
+    USING DELTA
+    LOCATION '{config["sptrans_silver_path"]}'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE TABLE IF NOT EXISTS sp_mobility_silver.gtfs_trips_enriched
+    USING DELTA
+    LOCATION '{config["gtfs_trips_enriched_path"]}'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE TABLE IF NOT EXISTS sp_mobility_audit.pipeline_runs
+    USING DELTA
+    LOCATION '{config["pipeline_runs_path"]}'
+    """
+)
+
+print("Observability catalog registration completed.")

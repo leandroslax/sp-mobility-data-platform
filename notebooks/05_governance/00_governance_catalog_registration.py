@@ -1,81 +1,62 @@
 # Databricks notebook source
 
-# Databricks notebook source
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
 
-# Databricks
-%run ../00_setup/00_config
 
-# Databricks notebook source
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 0,
-   "metadata": {
-    "application/vnd.databricks.v1+cell": {
-     "cellMetadata": {},
-     "inputWidgets": {},
-     "nuid": "38232fcd-e85a-46e8-a78d-891415bc8455",
-     "showTitle": false,
-     "tableResultSettingsMap": {},
-     "title": ""
+def load_config():
+    storage_account = _get_widget("storage_account", "stspmobilitydev001")
+    return {
+        "bronze_root": f"abfss://bronze@{storage_account}.dfs.core.windows.net",
+        "silver_root": f"abfss://silver@{storage_account}.dfs.core.windows.net",
+        "gold_root": f"abfss://gold@{storage_account}.dfs.core.windows.net",
     }
-   },
-   "outputs": [],
-   "source": [
-    "\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_bronze\n",
-    "LOCATION 'abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/_metastore/sp_mobility_bronze'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_silver\n",
-    "LOCATION 'abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/_metastore/sp_mobility_silver'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_gold\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/_metastore/sp_mobility_gold'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_audit\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/_metastore/sp_mobility_audit'\n",
-    "\"\"\")\n",
-    "\n",
-    "spark.sql(\"\"\"\n",
-    "CREATE DATABASE IF NOT EXISTS sp_mobility_quality\n",
-    "LOCATION 'abfss://gold@stspmobilitydev001dev001.dfs.core.windows.net/_metastore/sp_mobility_quality'\n",
-    "\"\"\")\n",
-    "\n",
-    "print(\"Hive Metastore databases created successfully\")\n",
-    "\n",
-    "spark.sql(\"SHOW DATABASES\").show(truncate=False)"
-   ]
-  }
- ],
- "metadata": {
-  "application/vnd.databricks.v1+notebook": {
-   "computePreferences": null,
-   "dashboards": [],
-   "environmentMetadata": {
-    "base_environment": "",
-    "environment_version": "4"
-   },
-   "inputWidgetPreferences": null,
-   "language": "python",
-   "notebookMetadata": {
-    "pythonIndentUnit": 4
-   },
-   "notebookName": "00_governance_catalog_registration",
-   "widgets": {}
-  },
-  "language_info": {
-   "name": "python"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 0
-}
+
+config = load_config()
+
+print("Registering governance databases...")
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_bronze
+    LOCATION '{config["bronze_root"]}/_metastore/sp_mobility_bronze'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_silver
+    LOCATION '{config["silver_root"]}/_metastore/sp_mobility_silver'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_gold
+    LOCATION '{config["gold_root"]}/_metastore/sp_mobility_gold'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_audit
+    LOCATION '{config["gold_root"]}/_metastore/sp_mobility_audit'
+    """
+)
+
+spark.sql(
+    f"""
+    CREATE DATABASE IF NOT EXISTS sp_mobility_quality
+    LOCATION '{config["gold_root"]}/_metastore/sp_mobility_quality'
+    """
+)
+
+print("Governance catalog registration completed.")

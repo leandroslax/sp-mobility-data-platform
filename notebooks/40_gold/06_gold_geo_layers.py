@@ -1,81 +1,34 @@
 # Databricks notebook source
-
-# Databricks notebook source
-
-# Databricks
-%run ../00_setup/00_config
-
-# Databricks notebook source
-
-
-
-print(bronze_path)
-print(gold_path)
+# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
 # COMMAND ----------
 
-dbutils.fs.mkdirs(gold_path)
+from pyspark.sql.functions import collect_list, col, sort_array, struct
 
-# COMMAND ----------
+config = load_config()
 
-stops_df = spark.read.format("delta").load(f"{bronze_path}/gtfs_stops")
+print("Starting GEO layers processing...")
 
-display(stops_df)
+df = spark.read.format("delta").load(config["gtfs_silver_shapes_path"])
 
-# COMMAND ----------
-
-from pyspark.sql.functions import col
-
-stops_geo = (
-    stops_df
-    .select(
-        col("stop_id"),
-        col("stop_name"),
-        col("stop_lat").alias("latitude"),
-        col("stop_lon").alias("longitude")
-    )
+points = df.select(
+    col("shape_id"),
+    struct(
+        col("shape_pt_sequence"),
+        col("shape_pt_lat"),
+        col("shape_pt_lon"),
+    ).alias("point"),
 )
 
-# COMMAND ----------
-
-display(stops_geo)
-
-# COMMAND ----------
-
-stops_geo.write.format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/bus_stops_geo")
-
-# COMMAND ----------
-
-shapes_df = spark.read.format("delta").load(f"{bronze_path}/gtfs_shapes")
-
-display(shapes_df)
-
-# COMMAND ----------
-
-from pyspark.sql.functions import col
-
-routes_geo = (
-    shapes_df
-    .select(
-        col("shape_id"),
-        col("shape_pt_lat").alias("latitude"),
-        col("shape_pt_lon").alias("longitude"),
-        col("shape_pt_sequence")
-    )
+routes_geo = points.groupBy("shape_id").agg(
+    sort_array(collect_list("point")).alias("points")
 )
 
-# COMMAND ----------
+(
+    routes_geo.write.format("delta")
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .save(f"{config['gold_root']}/gtfs/geo_routes")
+)
 
-display(routes_geo)
-
-# COMMAND ----------
-
-routes_geo.write.format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/bus_routes_geo")
-
-# COMMAND ----------
-
-display(dbutils.fs.ls(gold_path))
+print("GEO layers completed.")
