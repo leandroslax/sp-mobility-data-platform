@@ -1,1 +1,29 @@
-...
+name: CD - Deploy to Databricks
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        run: |
+          pip install databricks-cli
+
+      - name: Configure Databricks
+        run: |
+          databricks configure --token <<EOF2
+          ${{ secrets.DATABRICKS_HOST }}
+          ${{ secrets.DATABRICKS_TOKEN }}
+          EOF2
+
+      - name: Deploy notebooks
+        run: |
+          databricks workspace import_dir notebooks /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks -o

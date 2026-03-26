@@ -1,1 +1,32 @@
-...
+name: CI - Validate Notebooks
+
+on:
+  push:
+    branches:
+      - fix/databricks-config
+      - develop
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile $(find notebooks -name "*.py")
+
+      - name: Check forbidden patterns
+        run: |
+          if grep -r "%run" notebooks/; then
+            echo "❌ Avoid using %run in production"
+            exit 1
+          fi
+
+      - name: Lint
+        run: |
+          pip install flake8
+          flake8 notebooks --max-line-length=120 || true
