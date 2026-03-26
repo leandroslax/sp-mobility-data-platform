@@ -15,18 +15,41 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Validate Python syntax
         run: |
-          python -m py_compile $(find notebooks -name "*.py")
+          python -m py_compile $(find notebooks observability -name "*.py")
 
-      - name: Check forbidden patterns
+      - name: Validate Databricks job JSON
         run: |
-          if grep -r "%run" notebooks/; then
-            echo "❌ Avoid using %run in production"
+          python -m json.tool jobs/sp_mobility_job.json > /dev/null
+          python -m json.tool jobs/sp_mobility_job_update.json > /dev/null
+
+      - name: Check for relative %run usage
+        run: |
+          if rg '^# MAGIC %run (\\./|\\.\\./|[^/])' notebooks; then
+            echo "Relative %run detected. Prefer absolute workspace paths or inline config."
             exit 1
           fi
 
       - name: Lint
         run: |
           pip install flake8
-          flake8 notebooks --max-line-length=120 || true
+          flake8 notebooks observability --max-line-length=120
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform format check
+        run: |
+          terraform fmt -check -recursive
+
+      - name: Terraform validate dev
+        run: |
+          cd terraform/environments/dev
+          terraform init -backend=false
+          terraform validate
