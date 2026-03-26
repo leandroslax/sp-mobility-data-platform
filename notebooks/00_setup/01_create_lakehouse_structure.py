@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run "./config"
+# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
 config = load_config()
 

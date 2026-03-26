@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %run "../00_setup/config"
+# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
 import json
 from datetime import datetime

@@ -1,4 +1,4 @@
 # Databricks notebook source
-# MAGIC %run "./00_sql_dashboard_queries"
+# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/50_analytics/00_sql_dashboard_queries
 
 print("Analytics views refreshed.")
