@@ -1,5 +1,24 @@
 # Databricks notebook source
-# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
+
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
+
+
+def load_config():
+    storage_account = _get_widget("storage_account", "stspmobilitydev001")
+    return {
+        "bronze_root": f"abfss://bronze@{storage_account}.dfs.core.windows.net",
+        "silver_root": f"abfss://silver@{storage_account}.dfs.core.windows.net",
+        "gold_root": f"abfss://gold@{storage_account}.dfs.core.windows.net",
+    }
 
 config = load_config()
 
