@@ -1,5 +1,4 @@
 # Databricks notebook source
-
 print("⚙️ Loading global configuration...")
 
 # ==============================
@@ -7,7 +6,7 @@ print("⚙️ Loading global configuration...")
 # ==============================
 
 container = "bronze"
-storage_account = "stpmobilitydev001"
+storage_account = "stspmobilitydev001"
 
 # ==============================
 # PATHS
