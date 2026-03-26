@@ -1,6 +1,6 @@
 name: CD - Deploy to Databricks
 
-on:
+"on":
   push:
     branches:
       - develop

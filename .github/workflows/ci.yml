@@ -1,6 +1,6 @@
 name: CI - Validate Notebooks
 
-on:
+"on":
   push:
     branches:
       - fix/databricks-config
