@@ -1,5 +1,4 @@
 # Databricks notebook source
-# MAGIC %run ../00_setup/00_config
 
 spark.conf.set("spark.sql.shuffle.partitions", "8")
 

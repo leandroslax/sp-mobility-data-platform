@@ -1,6 +1,5 @@
 # Databricks notebook source
 # Databricks notebook source
-# MAGIC %run ../00_setup/config
 
 # ==========================================
 # IMPORTS
@@ -70,7 +69,6 @@ display(df_check.limit(10))
 # COMMAND ----------
 
 # ==========================================
-# CONFIG (INLINE - SEM %run)
 # ==========================================
 
 ENV = "dev"
