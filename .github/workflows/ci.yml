@@ -38,8 +38,12 @@ jobs:
 
       - name: Lint
         run: |
-          pip install flake8
+          pip install flake8 pytest
           flake8 notebooks observability --max-line-length=120
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit -q
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

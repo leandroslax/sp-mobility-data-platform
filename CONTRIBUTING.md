@@ -21,10 +21,22 @@ Este projeto foi estruturado para demonstrar boas práticas de engenharia de dad
 
 ## Validações recomendadas
 
+Instale primeiro as dependências de desenvolvimento:
+
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+```
+
 ### Python
 
 ```bash
 python -m py_compile $(find notebooks observability -name "*.py")
+```
+
+### Testes unitários
+
+```bash
+pytest tests/unit -q
 ```
 
 ### Terraform
