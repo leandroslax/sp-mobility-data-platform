@@ -1,0 +1,9 @@
+-- Silver layer tables
+
+CREATE TABLE IF NOT EXISTS sp_mobility_silver.sptrans_vehicle_positions
+USING DELTA
+LOCATION 'abfss://silver@stspmobilitydev001.dfs.core.windows.net/sptrans/vehicle_positions';
+
+CREATE TABLE IF NOT EXISTS sp_mobility_silver.gtfs_trips_enriched
+USING DELTA
+LOCATION 'abfss://silver@stspmobilitydev001.dfs.core.windows.net/gtfs_trips_enriched';

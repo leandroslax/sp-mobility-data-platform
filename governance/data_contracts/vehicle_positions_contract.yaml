@@ -1,0 +1,49 @@
+dataset: vehicle_positions
+layer: silver
+owner: data_engineering
+description: Vehicle position events from SPTrans API.
+
+schema:
+  event_date:
+    type: date
+    nullable: false
+
+  event_hour:
+    type: integer
+    nullable: false
+
+  vehicle_id:
+    type: string
+    nullable: false
+
+  line_id:
+    type: string
+    nullable: false
+
+  latitude:
+    type: double
+    nullable: false
+
+  longitude:
+    type: double
+    nullable: false
+
+  lat_grid:
+    type: double
+    nullable: true
+
+  lon_grid:
+    type: double
+    nullable: true
+
+  accessible:
+    type: boolean
+    nullable: true
+
+quality_rules:
+  - latitude between -90 and 90
+  - longitude between -180 and 180
+  - event_hour between 0 and 23
+
+classification: public
+retention: 2 years
