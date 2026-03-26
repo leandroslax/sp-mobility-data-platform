@@ -1,81 +1,80 @@
 # Databricks notebook source
-
 # Databricks notebook source
 
-# Databricks
-%run ../00_setup/00_config
+# ==========================================
+# CONFIG
+# ==========================================
 
-# Databricks notebook source
+container = "bronze"
+storage_account = "stspmobilitydev001"
 
+base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
 
+silver_path = f"{base_path}/gtfs/silver"
+gold_path = f"{base_path}/gtfs/gold"
 
-print(bronze_path)
-print(gold_path)
+# ==========================================
+# IMPORTS
+# ==========================================
 
-# COMMAND ----------
+from pyspark.sql.functions import col, collect_list, struct, sort_array
 
-dbutils.fs.mkdirs(gold_path)
+print("🗺️ Starting GEO LAYERS processing...")
 
-# COMMAND ----------
+# ==========================================
+# READ SILVER SHAPES
+# ==========================================
 
-stops_df = spark.read.format("delta").load(f"{bronze_path}/gtfs_stops")
+df = spark.read.format("delta").load(f"{silver_path}/shapes")
 
-display(stops_df)
+# ==========================================
+# GARANTIR ORDEM DOS PONTOS
+# ==========================================
 
-# COMMAND ----------
+print("📍 Organizando pontos por sequência...")
 
-from pyspark.sql.functions import col
-
-stops_geo = (
-    stops_df
-    .select(
-        col("stop_id"),
-        col("stop_name"),
-        col("stop_lat").alias("latitude"),
-        col("stop_lon").alias("longitude")
+points = (
+    df.select(
+        col("shape_id"),
+        struct(
+            col("shape_pt_sequence"),
+            col("shape_pt_lat"),
+            col("shape_pt_lon")
+        ).alias("point")
     )
 )
 
-# COMMAND ----------
+# ==========================================
+# AGRUPAR EM LINHAS (ROTAS)
+# ==========================================
 
-display(stops_geo)
-
-# COMMAND ----------
-
-stops_geo.write.format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/bus_stops_geo")
-
-# COMMAND ----------
-
-shapes_df = spark.read.format("delta").load(f"{bronze_path}/gtfs_shapes")
-
-display(shapes_df)
-
-# COMMAND ----------
-
-from pyspark.sql.functions import col
+print("🧩 Construindo rotas (linhas)...")
 
 routes_geo = (
-    shapes_df
-    .select(
-        col("shape_id"),
-        col("shape_pt_lat").alias("latitude"),
-        col("shape_pt_lon").alias("longitude"),
-        col("shape_pt_sequence")
+    points.groupBy("shape_id")
+    .agg(
+        sort_array(collect_list("point")).alias("points")
     )
 )
 
-# COMMAND ----------
+# ==========================================
+# SIMPLIFICAR ESTRUTURA
+# ==========================================
 
-display(routes_geo)
+print("🔧 Transformando para formato geo...")
 
-# COMMAND ----------
+routes_geo = routes_geo.select(
+    col("shape_id"),
+    col("points")
+)
 
-routes_geo.write.format("delta") \
+# ==========================================
+# WRITE GOLD
+# ==========================================
+
+routes_geo.write \
+    .format("delta") \
     .mode("overwrite") \
-    .save(f"{gold_path}/bus_routes_geo")
+    .save(f"{gold_path}/geo_routes")
 
-# COMMAND ----------
-
-display(dbutils.fs.ls(gold_path))
+print("✅ GEO LAYERS completed!")
