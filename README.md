@@ -288,16 +288,21 @@ Cobertura atual:
 
 - validação básica de sintaxe Python
 - checagem de padrões proibidos em notebooks
-- lint inicial
-- deploy de notebooks para Databricks em branch principal
+- lint em código operacional e testes
+- testes unitários
+- testes de integração para jobs, workflows e governança
+- `terraform fmt -check`
+- `terraform validate` em `dev`
+- deploy de notebooks para Databricks
+- atualização automática da definição do job Databricks
+- suporte a `workflow_dispatch` para deploy manual por ambiente
 
 Melhorias recomendadas para próxima fase:
 
-- falhar lint de forma estrita
-- validar Terraform
-- adicionar testes unitários e de integração
-- separar deploy por ambiente
-- adicionar política de promoção entre branches
+- adicionar promotion flow explícito entre `dev` e `prod`
+- adicionar smoke tests pós-deploy no Databricks
+- separar job definitions por ambiente
+- adicionar proteção por GitHub Environments e approvals de produção
 
 ## Como executar pela CLI
 
