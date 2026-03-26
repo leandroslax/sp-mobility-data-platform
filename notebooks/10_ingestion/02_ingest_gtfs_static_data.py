@@ -1,56 +1,58 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/config
 
-# ==========================================
-# CONFIG INLINE (JOB SAFE)
-# ==========================================
-
-container = "bronze"
-storage_account = "stspmobilitydev001"
-
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-
-gtfs_base_path = f"{base_path}/gtfs"
-
-gtfs_extract_path = f"{gtfs_base_path}/extracted"
-gtfs_bronze_path  = f"{gtfs_base_path}/bronze"
-
-# ==========================================
-# IMPORTS
-# ==========================================
+import io
+import zipfile
 
 import requests
-import zipfile
-import io
+from pyspark.sql.functions import current_timestamp, lit
 
-print("🚀 Starting GTFS ingestion...")
+config = load_config()
 
-# ==========================================
-# DOWNLOAD GTFS
-# ==========================================
+GTFS_DOWNLOAD_URL = "https://transitfeeds.com/p/sptrans/911/latest/download"
 
-url = "https://transitfeeds.com/p/sptrans/911/latest/download"
+print("Starting GTFS ingestion...")
+print(f"Environment: {config['env']}")
+print(f"Extract target: {config['gtfs_extract_path']}")
 
-response = requests.get(url)
+response = requests.get(GTFS_DOWNLOAD_URL, timeout=(30, 180))
+response.raise_for_status()
 
-z = zipfile.ZipFile(io.BytesIO(response.content))
+archive = zipfile.ZipFile(io.BytesIO(response.content))
 
-print("📦 Extracting files...")
+processed_entities = []
 
-# ==========================================
-# PROCESS FILES
-# ==========================================
+for file_name in sorted(archive.namelist()):
+    if not file_name.lower().endswith((".txt", ".csv")):
+        continue
 
-for file in z.namelist():
-    print(f"Processing: {file}")
+    entity = file_name.rsplit("/", 1)[-1].rsplit(".", 1)[0].lower()
+    target_path = config["gtfs_extract_paths"].get(entity)
 
+    if not target_path:
+        print(f"Skipping unsupported GTFS entity: {file_name}")
+        continue
+
+    print(f"Processing GTFS entity: {entity}")
+
+    csv_content = archive.read(file_name).decode("utf-8").splitlines()
     df = spark.read.option("header", True).csv(
-        spark.sparkContext.parallelize(
-            z.read(file).decode("utf-8").splitlines()
-        )
+        spark.sparkContext.parallelize(csv_content)
     )
 
-    df.write.format("delta") \
-        .mode("overwrite") \
-        .save(f"{gtfs_base_path}/delta")
+    (
+        df.withColumn("source_file", lit(file_name))
+        .withColumn("ingestion_timestamp", current_timestamp())
+        .write.format("delta")
+        .mode("overwrite")
+        .option("overwriteSchema", "true")
+        .save(target_path)
+    )
 
-print("✅ Ingestion completed!")
+    processed_entities.append((entity, target_path))
+
+print("GTFS ingestion completed.")
+
+for entity, target_path in processed_entities:
+    print(f"OK: {entity} -> {target_path}")
+

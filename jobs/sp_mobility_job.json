@@ -3,49 +3,155 @@
   "max_concurrent_runs": 1,
   "tasks": [
     {
-      "task_key": "ingestion",
+      "task_key": "oauth_connection",
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/02_ingest_gtfs_static_data"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/00_setup/00_adls_gen2_oauth_connection.py"
       },
       "job_cluster_key": "job_cluster"
     },
     {
-      "task_key": "bronze",
-      "depends_on": [{"task_key": "ingestion"}],
+      "task_key": "lakehouse_structure",
+      "depends_on": [{"task_key": "oauth_connection"}],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/03_bronze_gtfs"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/00_setup/01_create_lakehouse_structure.py"
       },
       "job_cluster_key": "job_cluster"
     },
     {
-      "task_key": "silver",
-      "depends_on": [{"task_key": "bronze"}],
+      "task_key": "governance_catalog",
+      "depends_on": [{"task_key": "oauth_connection"}],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/04_silver_gtfs"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/05_governance/00_governance_catalog_registration.py"
       },
       "job_cluster_key": "job_cluster"
     },
     {
-      "task_key": "gold_metrics",
-      "depends_on": [{"task_key": "silver"}],
+      "task_key": "register_bronze_tables",
+      "depends_on": [{"task_key": "governance_catalog"}],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/05_gold_shapes_metrics"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/05_governance/01_create_delta_tables_bronze.py"
       },
       "job_cluster_key": "job_cluster"
     },
     {
-      "task_key": "gold_geo",
-      "depends_on": [{"task_key": "gold_metrics"}],
+      "task_key": "register_silver_tables",
+      "depends_on": [{"task_key": "governance_catalog"}],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/06_gold_geo_layers"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/05_governance/02_register_silver_tables.py"
       },
       "job_cluster_key": "job_cluster"
     },
     {
-      "task_key": "gold_geojson",
-      "depends_on": [{"task_key": "gold_geo"}],
+      "task_key": "register_gold_tables",
+      "depends_on": [{"task_key": "governance_catalog"}],
       "notebook_task": {
-        "notebook_path": "/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/07_gold_map_layers"
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/05_governance/03_register_gold_tables.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "ingest_gtfs",
+      "depends_on": [{"task_key": "lakehouse_structure"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/10_ingestion/02_ingest_gtfs_static_data.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "bronze_gtfs",
+      "depends_on": [{"task_key": "ingest_gtfs"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/20_bronze/03_bronze_gtfs.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "silver_gtfs",
+      "depends_on": [{"task_key": "bronze_gtfs"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/30_silver/04_silver_gtfs.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "ingest_sptrans",
+      "depends_on": [{"task_key": "lakehouse_structure"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/10_ingestion/09_ingest_sptrans_vehicle_positions.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "bronze_sptrans",
+      "depends_on": [{"task_key": "ingest_sptrans"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/20_bronze/10_bronze_sptrans_vehicle_positions.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "silver_sptrans",
+      "depends_on": [{"task_key": "bronze_sptrans"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/30_silver/11_silver_sptrans_vehicle_positions.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "gold_mobility_intelligence",
+      "depends_on": [
+        {"task_key": "silver_gtfs"},
+        {"task_key": "silver_sptrans"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/40_gold/13_gold_sptrans_mobility_intelligence.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "gold_route_performance",
+      "depends_on": [{"task_key": "silver_sptrans"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "gold_city_activity",
+      "depends_on": [{"task_key": "silver_sptrans"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/40_gold/23_gold_city_activity.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "gold_city_heatmap",
+      "depends_on": [{"task_key": "silver_sptrans"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "gold_mobility_kpis",
+      "depends_on": [
+        {"task_key": "gold_route_performance"},
+        {"task_key": "gold_city_activity"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis.py"
+      },
+      "job_cluster_key": "job_cluster"
+    },
+    {
+      "task_key": "quality_runner",
+      "depends_on": [
+        {"task_key": "register_silver_tables"},
+        {"task_key": "register_gold_tables"},
+        {"task_key": "gold_mobility_kpis"}
+      ],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Repos/leandroslax/sp-mobility-data-platform/notebooks/35_quality/05_quality_runner.py"
       },
       "job_cluster_key": "job_cluster"
     }
@@ -56,7 +162,14 @@
       "new_cluster": {
         "spark_version": "13.3.x-scala2.12",
         "node_type_id": "Standard_DS3_v2",
-        "num_workers": 1
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.databricks.cluster.profile": "singleNode",
+          "spark.master": "local[*]"
+        },
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        }
       }
     }
   ]

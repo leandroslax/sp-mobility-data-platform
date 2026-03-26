@@ -1,139 +1,37 @@
 # Databricks notebook source
-# Databricks notebook source
-
-# ==========================================
-# IMPORTS
-# ==========================================
+# MAGIC %run ../00_setup/config
 
 from pyspark.sql.functions import current_timestamp
 
-print("🚀 Starting BRONZE GTFS processing...")
-
-# ==========================================
-# DEBUG CONFIG
-# ==========================================
-
-print("🔎 Validando config...")
-
-print("Storage:", storage_account)
-print("Base Path:", base_path)
-
-# ==========================================
-# SPARK CONFIG
-# ==========================================
+config = load_config()
 
 spark.conf.set("spark.sql.shuffle.partitions", "8")
 spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")
 spark.conf.set("spark.databricks.delta.autoCompact.enabled", "true")
 
-# ==========================================
-# READ
-# ==========================================
+print("Starting BRONZE GTFS processing...")
 
-source_path = f"{gtfs_base_path}/delta"
+for entity, bronze_target in config["gtfs_bronze_paths"].items():
+    source_path = config["gtfs_extract_paths"][entity]
 
-print(f"📥 Reading from: {source_path}")
+    try:
+        df = spark.read.format("delta").load(source_path)
+    except Exception as exc:
+        print(f"Skipping {entity}: could not read {source_path} ({exc})")
+        continue
 
-df = spark.read.format("delta").load(source_path)
+    row_count = df.count()
+    print(f"Loaded {entity}: {row_count} rows")
 
-print("✅ Data loaded")
+    (
+        df.withColumn("bronze_loaded_at", current_timestamp())
+        .write.format("delta")
+        .mode("overwrite")
+        .option("overwriteSchema", "true")
+        .save(bronze_target)
+    )
 
-# ==========================================
-# TRANSFORM
-# ==========================================
+    print(f"Wrote bronze dataset: {entity} -> {bronze_target}")
 
-df = df.withColumn("ingestion_time", current_timestamp())
+print("BRONZE GTFS completed.")
 
-# ==========================================
-# WRITE
-# ==========================================
-
-target_path = gtfs_bronze_path
-
-print(f"📤 Writing to: {target_path}")
-
-df.write.format("delta").mode("overwrite").save(target_path)
-
-print("✅ BRONZE completed")
-
-# ==========================================
-# VALIDATION
-# ==========================================
-
-df_check = spark.read.format("delta").load(target_path)
-
-print(f"📊 Total records: {df_check.count()}")
-
-display(df_check.limit(10))
-
-# COMMAND ----------
-
-# ==========================================
-# ==========================================
-
-ENV = "dev"
-
-container = "bronze"
-storage_account = "stspmobilitydev001"
-
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-
-gtfs_base_path = f"{base_path}/gtfs"
-gtfs_bronze_path = f"{gtfs_base_path}/bronze"
-
-# ==========================================
-# IMPORTS
-# ==========================================
-
-from pyspark.sql.functions import current_timestamp
-
-print("🚀 Starting BRONZE GTFS processing...")
-
-print("Storage:", storage_account)
-print("Base Path:", base_path)
-
-# ==========================================
-# SPARK CONFIG
-# ==========================================
-
-spark.conf.set("spark.sql.shuffle.partitions", "8")
-spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")
-spark.conf.set("spark.databricks.delta.autoCompact.enabled", "true")
-
-# ==========================================
-# READ
-# ==========================================
-
-source_path = f"{gtfs_base_path}/delta"
-
-print(f"📥 Reading from: {source_path}")
-
-df = spark.read.format("delta").load(source_path)
-
-print("✅ Data loaded")
-
-# ==========================================
-# TRANSFORM
-# ==========================================
-
-df = df.withColumn("ingestion_time", current_timestamp())
-
-# ==========================================
-# WRITE
-# ==========================================
-
-print(f"📤 Writing to: {gtfs_bronze_path}")
-
-df.write.format("delta").mode("overwrite").save(gtfs_bronze_path)
-
-print("✅ BRONZE completed")
-
-# ==========================================
-# VALIDATION
-# ==========================================
-
-df_check = spark.read.format("delta").load(gtfs_bronze_path)
-
-print(f"📊 Total records: {df_check.count()}")
-
-display(df_check.limit(10))

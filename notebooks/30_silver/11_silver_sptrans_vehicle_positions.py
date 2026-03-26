@@ -1,43 +1,32 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/config
 
-# Databricks notebook source
+from pyspark.sql.functions import col, hour, to_date
 
-# Databricks
-
-# Databricks notebook source
-
-from pyspark.sql.functions import *
-from pyspark.sql.types import *
-
-bronze_path = "abfss://bronze@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
-silver_path = "abfss://silver@stspmobilitydev001dev001.dfs.core.windows.net/sptrans/vehicle_positions"
+config = load_config()
+bronze_path = config["sptrans_bronze_path"]
+silver_path = config["sptrans_silver_path"]
 
 df_bronze = spark.read.format("delta").load(bronze_path)
 
-display(df_bronze)
-
 df_silver = (
-    df_bronze
-    .withColumn("timestamp_api", col("timestamp_api").cast("timestamp"))
+    df_bronze.withColumn("timestamp_api", col("timestamp_api").cast("timestamp"))
     .withColumn("ingestion_timestamp", col("ingestion_timestamp").cast("timestamp"))
     .dropDuplicates(["vehicle_prefix", "timestamp_api"])
     .filter(col("latitude").isNotNull())
     .filter(col("longitude").isNotNull())
     .filter(col("line_code").isNotNull())
-)
-
-df_silver = (
-    df_silver
     .withColumn("event_date", to_date("timestamp_api"))
     .withColumn("event_hour", hour("timestamp_api"))
 )
 
-df_silver.write \
-.format("delta") \
-.mode("overwrite") \
-.partitionBy("event_date") \
-.save(silver_path)
+(
+    df_silver.write.format("delta")
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .partitionBy("event_date")
+    .save(silver_path)
+)
 
-df_check = spark.read.format("delta").load(silver_path)
+print(f"Silver SPTrans dataset refreshed at {silver_path}")
 
-display(df_check)

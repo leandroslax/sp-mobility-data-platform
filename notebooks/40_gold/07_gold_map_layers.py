@@ -1,37 +1,18 @@
 # Databricks notebook source
-
-# ==========================================
-# CONFIG
-# ==========================================
-
-container = "bronze"
-storage_account = "stspmobilitydev001"
-
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-
-gold_path = f"{base_path}/gtfs/gold"
-
-# ==========================================
-# IMPORTS
-# ==========================================
+# MAGIC %run ../00_setup/config
 
 from pyspark.sql.functions import col, expr
 
-print("🗺️ Starting MAP LAYERS (GEOJSON)...")
+config = load_config()
 
-# ==========================================
-# READ GEO ROUTES
-# ==========================================
+print("Starting map layers generation...")
 
-df = spark.read.format("delta").load(f"{gold_path}/geo_routes")
-
-# ==========================================
-# GEOJSON
-# ==========================================
+df = spark.read.format("delta").load(f"{config['gold_root']}/gtfs/geo_routes")
 
 geojson_df = df.select(
     col("shape_id"),
-    expr("""
+    expr(
+        """
         to_json(
             named_struct(
                 'type', 'LineString',
@@ -39,16 +20,16 @@ geojson_df = df.select(
                 transform(points, p -> array(p.shape_pt_lon, p.shape_pt_lat))
             )
         )
-    """).alias("geojson")
+        """
+    ).alias("geojson"),
 )
 
-# ==========================================
-# WRITE GOLD
-# ==========================================
+(
+    geojson_df.write.format("delta")
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .save(f"{config['gold_root']}/gtfs/geojson_routes")
+)
 
-geojson_df.write \
-    .format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/geojson_routes")
+print("Map layers completed.")
 
-print("✅ GEOJSON completed!")

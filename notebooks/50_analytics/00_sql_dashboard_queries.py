@@ -1,160 +1,46 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/config
 
-# Databricks notebook source
+config = load_config()
 
-# Databricks
+bronze_root = config["bronze_root"]
+silver_root = config["silver_root"]
+gold_root = config["gold_root"]
 
-# Databricks notebook source
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-bronze_gtfs_routes = spark.read.format("delta").load(f"{bronze_path}/gtfs_routes")
-bronze_gtfs_stops = spark.read.format("delta").load(f"{bronze_path}/gtfs_stops")
-bronze_gtfs_trips = spark.read.format("delta").load(f"{bronze_path}/gtfs_trips")
-bronze_gtfs_stop_times = spark.read.format("delta").load(f"{bronze_path}/gtfs_stop_times")
-bronze_gtfs_calendar = spark.read.format("delta").load(f"{bronze_path}/gtfs_calendar")
-bronze_gtfs_shapes = spark.read.format("delta").load(f"{bronze_path}/gtfs_shapes")
-
-silver_gtfs_trips_enriched = spark.read.format("delta").load(f"{silver_path}/gtfs_trips_enriched")
-
-gold_bus_lines_operational = spark.read.format("delta").load(f"{gold_mobility_path}/bus_lines_operational")
-gold_bus_stops_geo = spark.read.format("delta").load(f"{gold_geo_path}/bus_stops_geo")
-gold_bus_routes_geo = spark.read.format("delta").load(f"{gold_geo_path}/bus_routes_geo")
-gold_bus_stops_map = spark.read.format("delta").load(f"{gold_map_path}/bus_stops_map")
-gold_bus_routes_points_enriched = spark.read.format("delta").load(f"{gold_map_path}/bus_routes_points_enriched")
-gold_bus_routes_wkt = spark.read.format("delta").load(f"{gold_map_path}/bus_routes_wkt")
-
-# COMMAND ----------
-
-bronze_gtfs_routes.createOrReplaceTempView("bronze_gtfs_routes")
-bronze_gtfs_stops.createOrReplaceTempView("bronze_gtfs_stops")
-bronze_gtfs_trips.createOrReplaceTempView("bronze_gtfs_trips")
-bronze_gtfs_stop_times.createOrReplaceTempView("bronze_gtfs_stop_times")
-bronze_gtfs_calendar.createOrReplaceTempView("bronze_gtfs_calendar")
-bronze_gtfs_shapes.createOrReplaceTempView("bronze_gtfs_shapes")
-
-silver_gtfs_trips_enriched.createOrReplaceTempView("silver_gtfs_trips_enriched")
-
-gold_bus_lines_operational.createOrReplaceTempView("gold_bus_lines_operational")
-gold_bus_stops_geo.createOrReplaceTempView("gold_bus_stops_geo")
-gold_bus_routes_geo.createOrReplaceTempView("gold_bus_routes_geo")
-gold_bus_stops_map.createOrReplaceTempView("gold_bus_stops_map")
-gold_bus_routes_points_enriched.createOrReplaceTempView("gold_bus_routes_points_enriched")
-gold_bus_routes_wkt.createOrReplaceTempView("gold_bus_routes_wkt")
-
-print("Temp views criadas com sucesso.")
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   (SELECT COUNT(*) FROM bronze_gtfs_routes) AS total_routes,
-# MAGIC   (SELECT COUNT(*) FROM bronze_gtfs_stops) AS total_stops,
-# MAGIC   (SELECT COUNT(*) FROM bronze_gtfs_trips) AS total_trips,
-# MAGIC   (SELECT COUNT(*) FROM bronze_gtfs_shapes) AS total_shape_points
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   route_id,
-# MAGIC   route_short_name,
-# MAGIC   route_long_name,
-# MAGIC   total_trips
-# MAGIC FROM gold_bus_lines_operational
-# MAGIC ORDER BY total_trips DESC
-# MAGIC LIMIT 20
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   stop_id,
-# MAGIC   stop_name,
-# MAGIC   latitude,
-# MAGIC   longitude
-# MAGIC FROM gold_bus_stops_map
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   shape_id,
-# MAGIC   route_id,
-# MAGIC   route_short_name,
-# MAGIC   route_long_name,
-# MAGIC   latitude,
-# MAGIC   longitude,
-# MAGIC   shape_pt_sequence
-# MAGIC FROM gold_bus_routes_points_enriched
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   shape_id,
-# MAGIC   route_id,
-# MAGIC   route_short_name,
-# MAGIC   route_long_name,
-# MAGIC   wkt_linestring
-# MAGIC FROM gold_bus_routes_wkt
-# MAGIC LIMIT 20
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   stop_id,
-# MAGIC   stop_name,
-# MAGIC   latitude,
-# MAGIC   longitude
-# MAGIC FROM gold_bus_stops_map
-
-# COMMAND ----------
-
-# MAGIC %pip install folium
-
-# COMMAND ----------
-
-# restart_python_environment
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-# reload_bus_stops_dataset
-
-
-
-bus_stops_map = spark.read.format("delta").load(f"{gold_map_path}/bus_stops_map")
-
-display(bus_stops_map.limit(5))
-
-# COMMAND ----------
-
-import folium
-
-pdf = bus_stops_map.limit(500).toPandas()
-
-map_sp = folium.Map(
-    location=[-23.55, -46.63],
-    zoom_start=11
+bronze_gtfs_routes = spark.read.format("delta").load(f"{bronze_root}/gtfs_routes")
+bronze_gtfs_stops = spark.read.format("delta").load(f"{bronze_root}/gtfs_stops")
+bronze_gtfs_trips = spark.read.format("delta").load(f"{bronze_root}/gtfs_trips")
+bronze_gtfs_stop_times = spark.read.format("delta").load(f"{bronze_root}/gtfs_stop_times")
+bronze_gtfs_calendar = spark.read.format("delta").load(f"{bronze_root}/gtfs_calendar")
+bronze_gtfs_shapes = spark.read.format("delta").load(f"{bronze_root}/gtfs_shapes")
+silver_gtfs_trips_enriched = spark.read.format("delta").load(
+    config["gtfs_trips_enriched_path"]
 )
 
-for _, row in pdf.iterrows():
-    folium.CircleMarker(
-        location=[row["latitude"], row["longitude"]],
-        radius=3,
-        popup=row["stop_name"],
-        color="blue",
-        fill=True
-    ).add_to(map_sp)
+gold_city_activity = spark.read.format("delta").load(config["city_activity_path"])
+gold_route_performance = spark.read.format("delta").load(config["route_performance_path"])
+gold_mobility_kpis = spark.read.format("delta").load(config["mobility_kpis_path"])
+gold_city_heatmap = spark.read.format("delta").load(config["city_heatmap_path"])
+gold_mobility_intelligence = spark.read.format("delta").load(
+    config["mobility_intelligence_path"]
+)
 
-map_sp
+datasets = {
+    "bronze_gtfs_routes": bronze_gtfs_routes,
+    "bronze_gtfs_stops": bronze_gtfs_stops,
+    "bronze_gtfs_trips": bronze_gtfs_trips,
+    "bronze_gtfs_stop_times": bronze_gtfs_stop_times,
+    "bronze_gtfs_calendar": bronze_gtfs_calendar,
+    "bronze_gtfs_shapes": bronze_gtfs_shapes,
+    "silver_gtfs_trips_enriched": silver_gtfs_trips_enriched,
+    "gold_city_activity": gold_city_activity,
+    "gold_route_performance": gold_route_performance,
+    "gold_mobility_kpis": gold_mobility_kpis,
+    "gold_city_heatmap": gold_city_heatmap,
+    "gold_mobility_intelligence": gold_mobility_intelligence,
+}
 
-# COMMAND ----------
+for name, df in datasets.items():
+    df.createOrReplaceTempView(name)
+    print(f"Temp view ready: {name}")
 

@@ -1,51 +1,26 @@
 # Databricks notebook source
-
-# ==========================================
-# CONFIG
-# ==========================================
-
-container = "bronze"
-storage_account = "stspmobilitydev001"
-
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
-
-silver_path = f"{base_path}/gtfs/silver"
-gold_path   = f"{base_path}/gtfs/gold"
-
-# ==========================================
-# IMPORTS
-# ==========================================
+# MAGIC %run ../00_setup/config
 
 from pyspark.sql.functions import col, max
 
-print("🚀 Starting GOLD SHAPES METRICS...")
+config = load_config()
 
-# ==========================================
-# READ SILVER
-# ==========================================
+print("Starting GOLD shapes metrics...")
 
-df = spark.read.format("delta").load(f"{silver_path}/shapes")
-
-# ==========================================
-# CALCULAR DISTÂNCIA
-# ==========================================
+df = spark.read.format("delta").load(config["gtfs_silver_shapes_path"])
 
 routes = (
     df.groupBy("shape_id")
-    .agg(
-        max("shape_dist_traveled").alias("total_distance")
-    )
+    .agg(max("shape_dist_traveled").alias("total_distance"))
+    .orderBy(col("total_distance").desc())
 )
 
-routes = routes.orderBy(col("total_distance").desc())
+(
+    routes.write.format("delta")
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .save(f"{config['gold_root']}/gtfs/routes_distance")
+)
 
-# ==========================================
-# WRITE GOLD
-# ==========================================
+print("GOLD shapes metrics completed.")
 
-routes.write \
-    .format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/routes_distance")
-
-print("✅ GOLD METRICS completed!")

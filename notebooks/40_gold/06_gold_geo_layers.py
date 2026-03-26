@@ -1,64 +1,33 @@
 # Databricks notebook source
+# MAGIC %run ../00_setup/config
 
-# ==========================================
-# CONFIG
-# ==========================================
+from pyspark.sql.functions import collect_list, col, sort_array, struct
 
-container = "bronze"
-storage_account = "stspmobilitydev001"
+config = load_config()
 
-base_path = f"abfss://{container}@{storage_account}.dfs.core.windows.net"
+print("Starting GEO layers processing...")
 
-silver_path = f"{base_path}/gtfs/silver"
-gold_path   = f"{base_path}/gtfs/gold"
+df = spark.read.format("delta").load(config["gtfs_silver_shapes_path"])
 
-# ==========================================
-# IMPORTS
-# ==========================================
-
-from pyspark.sql.functions import col, collect_list, struct, sort_array
-
-print("🗺️ Starting GEO LAYERS processing...")
-
-# ==========================================
-# READ SILVER
-# ==========================================
-
-df = spark.read.format("delta").load(f"{silver_path}/shapes")
-
-# ==========================================
-# ORGANIZAR PONTOS
-# ==========================================
-
-points = (
-    df.select(
-        col("shape_id"),
-        struct(
-            col("shape_pt_sequence"),
-            col("shape_pt_lat"),
-            col("shape_pt_lon")
-        ).alias("point")
-    )
+points = df.select(
+    col("shape_id"),
+    struct(
+        col("shape_pt_sequence"),
+        col("shape_pt_lat"),
+        col("shape_pt_lon"),
+    ).alias("point"),
 )
 
-# ==========================================
-# AGRUPAR EM LINHAS
-# ==========================================
-
-routes_geo = (
-    points.groupBy("shape_id")
-    .agg(
-        sort_array(collect_list("point")).alias("points")
-    )
+routes_geo = points.groupBy("shape_id").agg(
+    sort_array(collect_list("point")).alias("points")
 )
 
-# ==========================================
-# WRITE GOLD
-# ==========================================
+(
+    routes_geo.write.format("delta")
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .save(f"{config['gold_root']}/gtfs/geo_routes")
+)
 
-routes_geo.write \
-    .format("delta") \
-    .mode("overwrite") \
-    .save(f"{gold_path}/geo_routes")
+print("GEO layers completed.")
 
-print("✅ GEO LAYERS completed!")

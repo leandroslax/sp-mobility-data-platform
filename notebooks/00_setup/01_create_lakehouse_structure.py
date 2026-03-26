@@ -1,31 +1,29 @@
 # Databricks notebook source
+# MAGIC %run ./config
 
-# COMMAND ----------
+config = load_config()
 
-# COMMAND ----------
-
-print("🚀 Creating lakehouse structure...")
-
-# COMMAND ----------
-
-base_path = f"abfss://bronze@{account_fqdn}"
-
-folders = [
-    "raw/gtfs",
-    "raw/sptrans",
-    "bronze/gtfs",
-    "bronze/sptrans",
-    "silver",
-    "gold"
+paths_to_create = [
+    config["gtfs_extract_path"],
+    config["sptrans_landing_path"],
+    config["sptrans_bronze_path"],
+    config["sptrans_silver_path"],
+    config["sptrans_gold_path"],
+    config["route_performance_path"],
+    config["pipeline_audit_path"],
+    config["pipeline_runs_path"],
+    config["quality_path"],
+    config["gtfs_silver_shapes_path"],
+    config["gtfs_trips_enriched_path"],
 ]
 
-# COMMAND ----------
+paths_to_create.extend(config["gtfs_bronze_paths"].values())
 
-for folder in folders:
-    path = f"{base_path}/{folder}"
+print("Creating lakehouse structure...")
+
+for path in paths_to_create:
     dbutils.fs.mkdirs(path)
     print(f"OK: {path}")
 
-# COMMAND ----------
+print("Lakehouse structure created successfully.")
 
-print("✅ Lakehouse structure created!")
