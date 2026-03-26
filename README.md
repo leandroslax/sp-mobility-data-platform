@@ -25,6 +25,37 @@ Este projeto foi estruturado como um case de engenharia de dados profissional, c
 - Infraestrutura: Terraform
 - CI/CD: GitHub Actions
 
+## Project Status
+
+O projeto saiu de um estado inicial com falhas operacionais no Databricks para um fluxo validado ponta a ponta, com governança, qualidade, observabilidade, CI/CD e deploy controlado por ambiente.
+
+Status atual:
+
+- pipeline Databricks validado de ponta a ponta
+- CI em verde
+- CD em `develop` em verde
+- CD em `main` com deploy para `prod` aprovado e executado com sucesso
+- branches `develop` e `main` protegidas
+- repositório pronto para apresentação como case profissional de engenharia de dados
+
+## Achievements
+
+Principais entregas realizadas nesta fase:
+
+- estabilização dos notebooks Databricks com remoção de dependências frágeis de `%run`
+- ajuste dos paths de notebooks para o formato real do Workspace Databricks
+- alinhamento de secrets e chaves ao ambiente validado
+- fallback local para GTFS quando a origem remota retorna `403 Forbidden`
+- correção do `quality_runner` e dos jobs para execução com os paths corretos
+- migração do job para o cluster existente `sp-mobility`, evitando falhas de `job_cluster` efêmero
+- validação manual do pipeline completo: setup, governança, ingestão, bronze, silver, gold e quality
+- documentação fortalecida em `README`, `CONTRIBUTING`, Terraform, arquitetura e decisões
+- criação de base real de testes unitários e de integração
+- evolução do CI para sintaxe, JSON, YAML, lint, testes e Terraform
+- evolução do CD para importar notebooks, atualizar jobs e verificar deploy
+- configuração de GitHub Environments `dev` e `prod`
+- proteção das branches principais e promoção concluída até `main`
+
 ## Arquitetura
 
 ```mermaid
@@ -295,14 +326,17 @@ Cobertura atual:
 - `terraform validate` em `dev`
 - deploy de notebooks para Databricks
 - atualização automática da definição do job Databricks
+- verificação do deploy e da definição publicada no Databricks
+- uso de GitHub Environments para `dev` e `prod`
 - suporte a `workflow_dispatch` para deploy manual por ambiente
 
-Melhorias recomendadas para próxima fase:
+Próxima fase recomendada:
 
-- adicionar promotion flow explícito entre `dev` e `prod`
 - adicionar smoke tests pós-deploy no Databricks
 - separar job definitions por ambiente
-- adicionar proteção por GitHub Environments e approvals de produção
+- criar release/tag `v1.0.0`
+- adicionar screenshots finais ao `README`
+- revisar o About e os tópicos do repositório
 
 ## Como executar pela CLI
 
@@ -354,26 +388,13 @@ databricks secrets list-secrets kv-sp-mobility
 
 O problema foi mitigado ao substituir `job_cluster` efêmero pelo cluster existente `sp-mobility`.
 
-## Estado atual do projeto
-
-O projeto já demonstra:
-
-- arquitetura em camadas
-- orquestração real em Databricks
-- integração com ADLS via OAuth
-- governança
-- quality
-- observabilidade inicial
-- CI/CD inicial
-- infraestrutura como código
-
 ## Próximos passos
 
-Para elevar o projeto ao nível máximo de portfólio, os próximos passos recomendados são:
+Para fechar a primeira release do projeto com acabamento de portfólio, os próximos passos recomendados são:
 
-- criar testes unitários e de integração reais
-- fortalecer CI com validações estritas
-- expandir documentação de arquitetura e ADRs
-- evoluir observabilidade com métricas e alertas
-- documentar dashboards e evidências visuais de consumo
-- revisar higiene de repositório e artefatos de Terraform
+- criar a release/tag `v1.0.0`
+- adicionar screenshots finais ao `README`
+- revisar o About e os tópicos do repositório
+- adicionar smoke tests pós-deploy no Databricks
+- separar job definitions por ambiente
+- opcionalmente limpar branches antigas
