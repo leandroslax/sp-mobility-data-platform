@@ -53,7 +53,7 @@ jobs:
 
       - name: Lint
         run: |
-          flake8 notebooks observability src tests/unit --max-line-length=120
+          flake8 observability src tests/unit tests/integration --max-line-length=120
 
       - name: Run unit tests
         run: |
