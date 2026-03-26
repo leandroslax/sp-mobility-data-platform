@@ -54,10 +54,15 @@ response = requests.get(GTFS_DOWNLOAD_URL, timeout=(30, 180))
 response.raise_for_status()
 
 archive = zipfile.ZipFile(io.BytesIO(response.content))
+archive_entries = sorted(archive.namelist())
+
+print(f"Archive entries found: {len(archive_entries)}")
+for entry in archive_entries:
+    print(f" - {entry}")
 
 processed_entities = []
 
-for file_name in sorted(archive.namelist()):
+for file_name in archive_entries:
     if not file_name.lower().endswith((".txt", ".csv")):
         continue
 
@@ -85,6 +90,11 @@ for file_name in sorted(archive.namelist()):
     )
 
     processed_entities.append((entity, target_path))
+
+if not processed_entities:
+    raise Exception(
+        "No supported GTFS entities were processed from the downloaded archive."
+    )
 
 print("GTFS ingestion completed.")
 
