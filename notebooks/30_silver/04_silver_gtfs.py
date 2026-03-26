@@ -1,7 +1,33 @@
 # Databricks notebook source
-# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
 
 from pyspark.sql.functions import col, expr
+
+
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
+
+
+def load_config():
+    storage_account = _get_widget("storage_account", "stspmobilitydev001")
+    bronze_root = f"abfss://bronze@{storage_account}.dfs.core.windows.net"
+    silver_root = f"abfss://silver@{storage_account}.dfs.core.windows.net"
+    gtfs_entities = {"routes": "gtfs_routes", "shapes": "gtfs_shapes", "trips": "gtfs_trips"}
+    return {
+        "gtfs_bronze_paths": {
+            entity: f"{bronze_root}/{table_name}"
+            for entity, table_name in gtfs_entities.items()
+        },
+        "gtfs_silver_shapes_path": f"{silver_root}/gtfs/shapes",
+        "gtfs_trips_enriched_path": f"{silver_root}/gtfs_trips_enriched",
+    }
 
 config = load_config()
 
