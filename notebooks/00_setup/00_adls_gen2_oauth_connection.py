@@ -34,15 +34,15 @@ config = load_config()
 
 client_id = dbutils.secrets.get(
     scope=config["secret_scope"],
-    key="sp-mobility-client-id",
+    key="databricks-sp-client-id",
 )
 client_secret = dbutils.secrets.get(
     scope=config["secret_scope"],
-    key="sp-mobility-client-secret",
+    key="databricks-sp-secret",
 )
 tenant_id = dbutils.secrets.get(
     scope=config["secret_scope"],
-    key="sp-mobility-tenant-id",
+    key="databricks-sp-tenant-id",
 )
 
 spark.conf.set(
