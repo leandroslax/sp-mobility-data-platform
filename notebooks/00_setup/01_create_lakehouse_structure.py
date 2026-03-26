@@ -1,3 +1,4 @@
+%run ../00_setup/00_config
 # Databricks notebook source
 
 # COMMAND ----------

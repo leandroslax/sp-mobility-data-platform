@@ -1,6 +1,6 @@
 # Databricks notebook source
 
-# MAGIC %run /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_config
+# MAGIC %run ../00_setup/00_config
 
 # COMMAND ----------
 
