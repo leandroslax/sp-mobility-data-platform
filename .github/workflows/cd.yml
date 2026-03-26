@@ -103,7 +103,7 @@ jobs:
         if: env.DEPLOY_JOB_DEFINITION == 'true'
         run: |
           JOB_ID=$(python -c "import json; print(json.load(open('jobs/sp_mobility_job_update.json'))['job_id'])")
-          databricks jobs get "$JOB_ID" > /dev/null
+          databricks jobs get --job-id "$JOB_ID" > /dev/null
 
       - name: Publish deployment summary
         run: |
