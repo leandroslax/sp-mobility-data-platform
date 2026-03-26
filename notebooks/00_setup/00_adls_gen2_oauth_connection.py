@@ -1,5 +1,34 @@
 # Databricks notebook source
-# MAGIC %run /Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/config
+
+DEFAULTS_BY_ENV = {
+    "dev": {"storage_account": "stspmobilitydev001", "secret_scope": "kv-sp-mobility"},
+    "prod": {"storage_account": "stspmobilityprod001", "secret_scope": "kv-sp-mobility"},
+}
+
+
+def _get_widget(name, default_value):
+    try:
+        dbutils.widgets.text(name, default_value)
+    except Exception:
+        pass
+    try:
+        value = dbutils.widgets.get(name)
+        return value or default_value
+    except Exception:
+        return default_value
+
+
+def load_config():
+    env = _get_widget("env", "dev")
+    defaults = DEFAULTS_BY_ENV.get(env, DEFAULTS_BY_ENV["dev"])
+    storage_account = _get_widget("storage_account", defaults["storage_account"])
+    secret_scope = _get_widget("secret_scope", defaults["secret_scope"])
+    return {
+        "env": env,
+        "storage_account": storage_account,
+        "account_fqdn": f"{storage_account}.dfs.core.windows.net",
+        "secret_scope": secret_scope,
+    }
 
 config = load_config()
 
