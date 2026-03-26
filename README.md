@@ -1,61 +1,154 @@
 # sp-mobility-data-platform
 
-Plataforma de engenharia de dados para mobilidade urbana em Databricks, usando arquitetura Lakehouse com camadas Bronze, Silver e Gold sobre ADLS Gen2.
+Plataforma de engenharia de dados para mobilidade urbana em Sao Paulo, construída em Azure + Databricks com arquitetura Lakehouse e modelagem Medallion. O projeto integra dados GTFS e posições de veículos SPTrans, transforma esses dados em camadas analíticas e publica datasets Gold com foco em inteligência operacional e analytics.
 
-## Arquitetura
+## Visão geral
+
+Este projeto foi estruturado como um case de engenharia de dados profissional, com foco em:
+
+- ingestão de múltiplas fontes
+- processamento em camadas Bronze, Silver e Gold
+- governança e rastreabilidade
+- data quality
+- observabilidade
+- infraestrutura como código
+- orquestração em Databricks Jobs
+
+## Stack
 
 - Cloud: Azure
 - Storage: ADLS Gen2
 - Processamento: Databricks
-- Formato: Delta Lake
-- Arquitetura: Medallion
+- Engine: Apache Spark
+- Tabelas: Delta Lake
+- Orquestração: Databricks Jobs
+- Infraestrutura: Terraform
+- CI/CD: GitHub Actions
 
-Fluxo principal:
+## Arquitetura
 
-```text
-Setup -> Governance -> Ingestion -> Bronze -> Silver -> Gold -> Quality
+```mermaid
+flowchart LR
+    A["TransitFeeds / GTFS"] --> B["Landing / Raw"]
+    C["SPTrans API"] --> B
+    B --> D["Bronze"]
+    D --> E["Silver"]
+    E --> F["Gold"]
+    F --> G["Dashboards / Analytics / Consumption"]
+    D --> H["Quality Checks"]
+    E --> H
+    F --> H
+    D --> I["Observability / Audit"]
+    E --> I
+    F --> I
 ```
 
-## Status atual
+## Pipeline
 
-O pipeline foi validado com sucesso no Databricks em março de 2026.
-
-Validações concluídas:
-
-- notebooks de setup executando com sucesso
-- governança executando com sucesso
-- ingestão GTFS executando com fallback local quando o download externo retorna 403
-- ingestão SPTrans executando com sucesso
-- camadas Bronze, Silver e Gold executando com sucesso
-- `05_quality_runner` executando com sucesso
-- job Databricks `847346803592537` executando com sucesso
-
-## Estrutura do projeto
-
-```text
-notebooks/
-  00_setup/
-  05_governance/
-  10_ingestion/
-  20_bronze/
-  30_silver/
-  35_quality/
-  40_gold/
-  45_observability/
-jobs/
-workflows/
-observability/
-terraform/
+```mermaid
+flowchart TD
+    A["00_setup / OAuth"] --> B["01_setup / Lakehouse Structure"]
+    A --> C["05_governance / Catalog Registration"]
+    C --> D["05_governance / Bronze Tables"]
+    C --> E["05_governance / Silver Tables"]
+    C --> F["05_governance / Gold Tables"]
+    B --> G["10_ingestion / GTFS"]
+    G --> H["20_bronze / GTFS"]
+    H --> I["30_silver / GTFS"]
+    B --> J["10_ingestion / SPTrans"]
+    J --> K["20_bronze / SPTrans"]
+    K --> L["30_silver / SPTrans"]
+    I --> M["40_gold / Mobility Intelligence"]
+    L --> M
+    L --> N["40_gold / Route Performance"]
+    L --> O["40_gold / City Activity"]
+    L --> P["40_gold / City Heatmap"]
+    N --> Q["40_gold / Mobility KPIs"]
+    O --> Q
+    E --> R["35_quality / Quality Runner"]
+    F --> R
+    Q --> R
 ```
 
-## Pré-requisitos
+## Camadas de dados
 
-Antes de rodar o pipeline, o ambiente Databricks precisa ter:
+### Landing / Raw
+
+Responsável por receber os dados de origem sem transformação relevante.
+
+- GTFS estático
+- snapshots da API SPTrans
+
+### Bronze
+
+Responsável por estruturar os dados brutos em Delta Lake, preservando granularidade e histórico.
+
+- `gtfs_agency`
+- `gtfs_calendar`
+- `gtfs_routes`
+- `gtfs_shapes`
+- `gtfs_stop_times`
+- `gtfs_stops`
+- `gtfs_trips`
+- `sptrans_vehicle_positions`
+
+### Silver
+
+Responsável por padronização, limpeza e enriquecimento.
+
+- `gtfs/shapes`
+- `gtfs_trips_enriched`
+- `sptrans/vehicle_positions`
+
+### Gold
+
+Responsável por datasets analíticos orientados ao consumo.
+
+- `mobility/intelligence`
+- `route_performance`
+- `city_activity`
+- `map/city_heatmap`
+- `mobility_kpis`
+
+## Fontes de dados
+
+### GTFS
+
+- origem principal: TransitFeeds
+- comportamento operacional validado: fallback local quando a origem remota retorna `403 Forbidden`
+
+Fallback utilizado no workspace validado:
+
+- `/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/data/raw/gtfs/cittamobi_gtfs.zip`
+
+### SPTrans
+
+- origem: API SPTrans
+- uso de token armazenado em secret scope do Databricks
+
+## Estrutura do repositório
+
+```text
+config/                  configuracoes por ambiente
+data/                    dados locais de apoio e fallback
+docs/                    arquitetura e decisoes
+governance/              dicionario, policies, contracts, lineage e DDL
+jobs/                    definicoes de jobs Databricks
+notebooks/               notebooks por camada funcional
+observability/           utilitarios de auditoria e observabilidade
+terraform/               infraestrutura como codigo
+tests/                   testes unitarios, integracao e quality
+workflows/               definicoes de pipelines e workflows
+```
+
+## Configuração de ambiente
+
+Antes da execução, o ambiente Databricks precisa ter:
 
 - acesso ao ADLS Gen2
-- acesso ao workspace com os notebooks deste repositório
+- acesso aos notebooks no Workspace
 - secret scope `kv-sp-mobility`
-- cluster existente `sp-mobility`
+- cluster `sp-mobility`
 
 Cluster validado:
 
@@ -71,24 +164,24 @@ No scope `kv-sp-mobility`, os seguintes secrets devem existir:
 - `databricks-sp-tenant-id`
 - `sptrans-api-token`
 
-## Configuração do job
+## Jobs e orquestração
 
 Job validado:
 
 - nome: `sp-mobility-pipeline`
 - job id: `847346803592537`
 
-Arquivos de definição:
+Artefatos principais:
 
 - [jobs/sp_mobility_job.json](/Users/leandrosantos/Downloads/sp-mobility-data-platform/jobs/sp_mobility_job.json)
 - [jobs/sp_mobility_job_update.json](/Users/leandrosantos/Downloads/sp-mobility-data-platform/jobs/sp_mobility_job_update.json)
 - [workflows/jobs/sp_mobility_lakehouse_pipeline.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/workflows/jobs/sp_mobility_lakehouse_pipeline.yml)
 
-Os jobs estão configurados para usar o cluster existente `sp-mobility`, evitando falhas de provisionamento do `job_cluster` efêmero.
+O job foi estabilizado para usar `existing_cluster_id` do cluster `sp-mobility`, evitando falhas de provisionamento do `job_cluster` efêmero.
 
-## Execução manual no Databricks
+## Execução validada no Databricks
 
-Ordem validada de execução manual:
+Execução manual validada nesta ordem:
 
 1. `notebooks/00_setup/00_adls_gen2_oauth_connection`
 2. `notebooks/00_setup/01_create_lakehouse_structure`
@@ -109,7 +202,104 @@ Ordem validada de execução manual:
 17. `notebooks/40_gold/25_gold_mobility_kpis`
 18. `notebooks/35_quality/05_quality_runner`
 
-## Execução via CLI
+Resultado validado:
+
+- pipeline ponta a ponta executando com sucesso
+- quality runner executando com sucesso
+- job Databricks executando com sucesso
+
+## Observabilidade
+
+O projeto já possui uma base de observabilidade com auditoria de pipeline e artefatos dedicados.
+
+Itens presentes:
+
+- utilitário [pipeline_audit.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/observability/pipeline_audit.py)
+- notebook de observabilidade em `notebooks/45_observability`
+- documentação em [governance/audit/pipeline_audit.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/audit/pipeline_audit.md)
+
+Práticas aplicadas:
+
+- auditoria por execução
+- separação de artefatos operacionais
+- base para métricas de pipeline e troubleshooting
+
+## Data Quality
+
+O projeto inclui camada dedicada de qualidade de dados em `notebooks/35_quality`.
+
+Checks validados:
+
+- qualidade de `silver_sptrans_vehicle_positions`
+- qualidade de `silver_gtfs_trips_enriched`
+- qualidade de `gold_city_activity`
+- qualidade de `gold_mobility_kpis`
+
+Artefatos relacionados:
+
+- [governance/quality/data_quality_rules.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/quality/data_quality_rules.md)
+- [governance/data_contracts/vehicle_positions_contract.yaml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/data_contracts/vehicle_positions_contract.yaml)
+
+## Governança
+
+O projeto inclui artefatos de governança além da simples implementação técnica.
+
+Itens presentes:
+
+- dicionário de dados
+- políticas de acesso
+- classificação de dados
+- retenção
+- ownership
+- linhagem
+- contratos de dados
+- DDL por camada
+
+Referências:
+
+- [governance/README.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/README.md)
+- [governance/lineage/mobility_lineage.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/lineage/mobility_lineage.md)
+
+## Infraestrutura como código
+
+O provisionamento de recursos está organizado em Terraform por ambiente e por módulo.
+
+Estrutura:
+
+- `terraform/environments/dev`
+- `terraform/environments/prod`
+- `terraform/modules/resource_group`
+- `terraform/modules/storage`
+- `terraform/modules/keyvault`
+- `terraform/modules/databricks`
+
+Observação:
+
+- a documentação de Terraform ainda pode ser expandida em [terraform/README.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/terraform/README.md)
+
+## CI/CD
+
+O projeto já possui workflows de CI/CD em GitHub Actions:
+
+- [ci.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/.github/workflows/ci.yml)
+- [cd.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/.github/workflows/cd.yml)
+
+Cobertura atual:
+
+- validação básica de sintaxe Python
+- checagem de padrões proibidos em notebooks
+- lint inicial
+- deploy de notebooks para Databricks em branch principal
+
+Melhorias recomendadas para próxima fase:
+
+- falhar lint de forma estrita
+- validar Terraform
+- adicionar testes unitários e de integração
+- separar deploy por ambiente
+- adicionar política de promoção entre branches
+
+## Como executar pela CLI
 
 Atualizar o job:
 
@@ -117,13 +307,13 @@ Atualizar o job:
 databricks jobs reset --json @jobs/sp_mobility_job_update.json
 ```
 
-Disparar uma execução:
+Executar o job:
 
 ```bash
 databricks jobs run-now 847346803592537
 ```
 
-Consultar a configuração atual do job:
+Consultar a definição atual do job:
 
 ```bash
 databricks jobs get 847346803592537
@@ -135,53 +325,50 @@ Consultar um run:
 databricks jobs get-run <run_id>
 ```
 
-## Observações operacionais
-
-### GTFS
-
-O notebook `02_ingest_gtfs_static_data` tenta baixar o GTFS remoto. Quando a fonte externa responde `403 Forbidden`, o pipeline usa fallback local:
-
-- `/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/data/raw/gtfs/cittamobi_gtfs.zip`
-
-Isso foi validado em execução real.
-
-### Quality runner
-
-O notebook `05_quality_runner` usa paths absolutos de Workspace sem extensão `.py`, porque esse foi o formato aceito pelo `dbutils.notebook.run()` no workspace validado.
-
-### Workspace paths
-
-Os notebooks operacionais do job estão configurados em:
-
-- `/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/...`
-
-Se o repositório for montado em outro path de workspace, os notebooks de quality e os artefatos de job podem precisar de ajuste.
-
 ## Troubleshooting
 
 ### Erro de `%run` no Databricks
 
-Os notebooks principais foram ajustados para evitar dependência frágil de `%run` relativo. Se um notebook antigo ainda falhar por parsing, padronize-o para o mesmo modelo usado nos notebooks já validados.
+Os notebooks principais foram estabilizados para evitar dependência frágil de `%run` relativo no fluxo crítico de execução.
+
+### Erro de notebook não encontrado
+
+O job deve apontar para paths em:
+
+- `/Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/...`
 
 ### Erro de secret inexistente
 
-Confirme o scope e as chaves:
+Confira os secrets do scope:
 
 ```bash
 databricks secrets list-secrets kv-sp-mobility
 ```
 
-### Erro de notebook não encontrado no job
-
-Confirme que o job aponta para paths em `/Workspace/Users/...` e não em `/Workspace/Repos/...`.
-
 ### Job travado em `Waiting for cluster`
 
-O pipeline foi estabilizado trocando o `job_cluster` efêmero pelo cluster existente `sp-mobility`.
+O problema foi mitigado ao substituir `job_cluster` efêmero pelo cluster existente `sp-mobility`.
 
-## Próximos passos recomendados
+## Estado atual do projeto
 
-- adicionar schedule no Databricks quando a operação sair do modo manual
-- documentar política de acesso ao cluster e ao secret scope
-- evoluir observabilidade e alertas
-- adicionar validações automatizadas antes do deploy
+O projeto já demonstra:
+
+- arquitetura em camadas
+- orquestração real em Databricks
+- integração com ADLS via OAuth
+- governança
+- quality
+- observabilidade inicial
+- CI/CD inicial
+- infraestrutura como código
+
+## Próximos passos
+
+Para elevar o projeto ao nível máximo de portfólio, os próximos passos recomendados são:
+
+- criar testes unitários e de integração reais
+- fortalecer CI com validações estritas
+- expandir documentação de arquitetura e ADRs
+- evoluir observabilidade com métricas e alertas
+- documentar dashboards e evidências visuais de consumo
+- revisar higiene de repositório e artefatos de Terraform
