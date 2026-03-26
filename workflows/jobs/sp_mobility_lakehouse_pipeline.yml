@@ -8,7 +8,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/00_adls_gen2_oauth_connection
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: lakehouse_structure
           depends_on:
@@ -16,7 +16,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/00_setup/01_create_lakehouse_structure
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: governance_catalog
           depends_on:
@@ -24,7 +24,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/00_governance_catalog_registration
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: register_bronze_tables
           depends_on:
@@ -32,7 +32,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/01_create_delta_tables_bronze
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: register_silver_tables
           depends_on:
@@ -40,7 +40,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/02_register_silver_tables
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: register_gold_tables
           depends_on:
@@ -48,7 +48,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/05_governance/03_register_gold_tables
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: ingest_gtfs
           depends_on:
@@ -56,7 +56,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/02_ingest_gtfs_static_data
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: bronze_gtfs
           depends_on:
@@ -64,7 +64,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/03_bronze_gtfs
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: silver_gtfs
           depends_on:
@@ -72,7 +72,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/04_silver_gtfs
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: ingest_sptrans
           depends_on:
@@ -80,7 +80,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/10_ingestion/09_ingest_sptrans_vehicle_positions
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: bronze_sptrans
           depends_on:
@@ -88,7 +88,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/20_bronze/10_bronze_sptrans_vehicle_positions
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: silver_sptrans
           depends_on:
@@ -96,7 +96,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/30_silver/11_silver_sptrans_vehicle_positions
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: gold_mobility_intelligence
           depends_on:
@@ -105,7 +105,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/13_gold_sptrans_mobility_intelligence
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: gold_route_performance
           depends_on:
@@ -113,7 +113,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: gold_city_activity
           depends_on:
@@ -121,7 +121,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/23_gold_city_activity
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: gold_city_heatmap
           depends_on:
@@ -129,7 +129,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: gold_mobility_kpis
           depends_on:
@@ -138,7 +138,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
         - task_key: quality_runner
           depends_on:
@@ -148,7 +148,7 @@ resources:
           notebook_task:
             notebook_path: /Workspace/Users/slaxdataengineer@outlook.com/sp-mobility-data-platform/notebooks/35_quality/05_quality_runner
             source: GIT
-          existing_cluster_id: 0317-162018-qffrgihu
+          existing_cluster_id: 0323-121133-n0dnzyjm
 
       queue:
         enabled: true
