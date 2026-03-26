@@ -96,7 +96,8 @@ jobs:
       - name: Update Databricks job definition
         if: env.DEPLOY_JOB_DEFINITION == 'true'
         run: |
-          databricks jobs reset --json @jobs/sp_mobility_job_update.json
+          JOB_PAYLOAD=$(python -c "import json; print(json.dumps(json.load(open('jobs/sp_mobility_job_update.json'))))")
+          databricks jobs reset --json "$JOB_PAYLOAD"
 
       - name: Verify Databricks job definition
         if: env.DEPLOY_JOB_DEFINITION == 'true'
