@@ -204,9 +204,9 @@ Job validado:
 
 Artefatos principais:
 
-- [jobs/sp_mobility_job.json](/Users/leandrosantos/Downloads/sp-mobility-data-platform/jobs/sp_mobility_job.json)
-- [jobs/sp_mobility_job_update.json](/Users/leandrosantos/Downloads/sp-mobility-data-platform/jobs/sp_mobility_job_update.json)
-- [workflows/jobs/sp_mobility_lakehouse_pipeline.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/workflows/jobs/sp_mobility_lakehouse_pipeline.yml)
+- [jobs/sp_mobility_job.json](jobs/sp_mobility_job.json)
+- [jobs/sp_mobility_job_update.json](jobs/sp_mobility_job_update.json)
+- [workflows/jobs/sp_mobility_lakehouse_pipeline.yml](workflows/jobs/sp_mobility_lakehouse_pipeline.yml)
 
 O job foi estabilizado para usar `existing_cluster_id` do cluster `sp-mobility`, evitando falhas de provisionamento do `job_cluster` efêmero.
 
@@ -245,9 +245,9 @@ O projeto já possui uma base de observabilidade com auditoria de pipeline e art
 
 Itens presentes:
 
-- utilitário [pipeline_audit.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/observability/pipeline_audit.py)
+- utilitário [pipeline_audit.py](observability/pipeline_audit.py)
 - notebook de observabilidade em `notebooks/45_observability`
-- documentação em [governance/audit/pipeline_audit.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/audit/pipeline_audit.md)
+- documentação em [governance/audit/pipeline_audit.md](governance/audit/pipeline_audit.md)
 
 Práticas aplicadas:
 
@@ -268,8 +268,8 @@ Checks validados:
 
 Artefatos relacionados:
 
-- [governance/quality/data_quality_rules.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/quality/data_quality_rules.md)
-- [governance/data_contracts/vehicle_positions_contract.yaml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/data_contracts/vehicle_positions_contract.yaml)
+- [governance/quality/data_quality_rules.md](governance/quality/data_quality_rules.md)
+- [governance/data_contracts/vehicle_positions_contract.yaml](governance/data_contracts/vehicle_positions_contract.yaml)
 
 ## Analytics / BI
 
@@ -283,14 +283,14 @@ Datasets analíticos atualmente utilizados:
 
 Artefatos relacionados:
 
-- [00_sql_dashboard_queries.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/50_analytics/00_sql_dashboard_queries.py)
-- [08_sql_dashboard_queries.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/50_analytics/08_sql_dashboard_queries.py)
-- [25_gold_mobility_kpis.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis.py)
-- [22_gold_route_performance.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance.py)
-- [24_gold_city_heatmap.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap.py)
-- [sp_mobility_dashboard_ptbr.html](/Users/leandrosantos/Downloads/sp-mobility-data-platform/docs/assets/sp_mobility_dashboard_ptbr.html)
-- [sp_mobility_dashboard_mockup.svg](/Users/leandrosantos/Downloads/sp-mobility-data-platform/docs/assets/sp_mobility_dashboard_mockup.svg)
-- [generate_sp_mobility_dashboard.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/scripts/generate_sp_mobility_dashboard.py)
+- [00_sql_dashboard_queries.py](notebooks/50_analytics/00_sql_dashboard_queries.py)
+- [08_sql_dashboard_queries.py](notebooks/50_analytics/08_sql_dashboard_queries.py)
+- [25_gold_mobility_kpis.py](notebooks/40_gold/25_gold_mobility_kpis.py)
+- [22_gold_route_performance.py](notebooks/40_gold/22_gold_route_performance.py)
+- [24_gold_city_heatmap.py](notebooks/40_gold/24_gold_city_heatmap.py)
+- [sp_mobility_dashboard_ptbr.html](docs/assets/sp_mobility_dashboard_ptbr.html)
+- [sp_mobility_dashboard_mockup.svg](docs/assets/sp_mobility_dashboard_mockup.svg)
+- [generate_sp_mobility_dashboard.py](scripts/generate_sp_mobility_dashboard.py)
 
 Status atual da camada de consumo:
 
@@ -306,6 +306,23 @@ O dashboard atual foi construído a partir dos datasets exportados de `mobility_
 - acessibilidade
 - concentração por linha
 - distribuição espacial por grid geográfico
+
+### Preview do dashboard
+
+![Preview do dashboard SP Mobility](docs/assets/sp_mobility_dashboard_mockup.svg)
+
+O artefato final em HTML reúne:
+
+- KPIs operacionais em português
+- série temporal por snapshot
+- ranking de linhas
+- hotspots geográficos
+- mapa operacional da região de São Paulo baseado em `lat_grid` e `lon_grid`
+
+Arquivos de apoio:
+
+- [Dashboard HTML](docs/assets/sp_mobility_dashboard_ptbr.html)
+- [Gerador do dashboard](scripts/generate_sp_mobility_dashboard.py)
 
 ## Governança
 
@@ -324,8 +341,8 @@ Itens presentes:
 
 Referências:
 
-- [governance/README.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/README.md)
-- [governance/lineage/mobility_lineage.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/governance/lineage/mobility_lineage.md)
+- [governance/README.md](governance/README.md)
+- [governance/lineage/mobility_lineage.md](governance/lineage/mobility_lineage.md)
 
 ## Infraestrutura como código
 
@@ -342,14 +359,14 @@ Estrutura:
 
 Observação:
 
-- a documentação de Terraform ainda pode ser expandida em [terraform/README.md](/Users/leandrosantos/Downloads/sp-mobility-data-platform/terraform/README.md)
+- a documentação de Terraform ainda pode ser expandida em [terraform/README.md](terraform/README.md)
 
 ## CI/CD
 
 O projeto já possui workflows de CI/CD em GitHub Actions:
 
-- [ci.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/.github/workflows/ci.yml)
-- [cd.yml](/Users/leandrosantos/Downloads/sp-mobility-data-platform/.github/workflows/cd.yml)
+- [ci.yml](.github/workflows/ci.yml)
+- [cd.yml](.github/workflows/cd.yml)
 
 Cobertura atual:
 
