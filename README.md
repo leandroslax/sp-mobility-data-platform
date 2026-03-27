@@ -440,13 +440,14 @@ databricks secrets list-secrets kv-sp-mobility
 
 O problema foi mitigado ao substituir `job_cluster` efêmero pelo cluster existente `sp-mobility`.
 
-## Próximos passos
+## Conclusão
 
-Para evoluções futuras do projeto, os próximos passos opcionais são:
+O projeto foi consolidado como um case profissional de engenharia de dados, com pipeline Lakehouse validado ponta a ponta em Azure + Databricks, governança, qualidade, observabilidade, CI/CD e camada analítica orientada a consumo.
 
-- publicar o dashboard em host estático ou GitHub Pages
-- adicionar screenshot final do dashboard ao `README`
-- revisar o About e os tópicos do repositório
-- adicionar smoke tests pós-deploy no Databricks
-- separar job definitions por ambiente
-- opcionalmente limpar branches antigas
+A entrega final inclui:
+
+- execução validada do pipeline em ambiente Databricks
+- datasets Gold prontos para consumo analítico
+- automação de deploy por ambiente
+- documentação técnica e operacional fortalecida
+- dashboard operacional em português construído a partir dos exports analíticos do projeto
