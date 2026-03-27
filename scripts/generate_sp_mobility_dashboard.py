@@ -116,14 +116,14 @@ def svg_map_heatmap(heat_rows: list[dict], route_rows: list[dict], width: int, h
         x = scale(r["avg_longitude"], min(lons), max(lons), pad, width - pad)
         y = scale(r["avg_latitude"], min(lats), max(lats), height - pad, pad)
         labels.append(
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" fill="#f4f8fb"></circle>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" fill="#163449"></circle>'
             f'<text x="{x + 6:.1f}" y="{y - 6:.1f}" class="map-label">{r["line_code"]}</text>'
         )
     return f"""
     <svg viewBox="0 0 {width} {height}" class="chart">
-      <rect x="0" y="0" width="{width}" height="{height}" rx="18" fill="#0c1c29" stroke="#264157"/>
-      <path d="M70 255 C160 120, 320 96, 450 132 S710 260, 900 214 S1160 120, 1320 170" stroke="#28455b" stroke-width="4" fill="none" opacity="0.55"/>
-      <path d="M92 290 C250 200, 430 316, 620 246 S1000 160, 1260 250" stroke="#1c3142" stroke-width="3" fill="none" opacity="0.5"/>
+      <rect x="0" y="0" width="{width}" height="{height}" rx="18" fill="#f8fbfe" stroke="#d5e2ec"/>
+      <path d="M70 255 C160 120, 320 96, 450 132 S710 260, 900 214 S1160 120, 1320 170" stroke="#c4d6e3" stroke-width="4" fill="none" opacity="0.95"/>
+      <path d="M92 290 C250 200, 430 316, 620 246 S1000 160, 1260 250" stroke="#dbe6ee" stroke-width="3" fill="none" opacity="1"/>
       {''.join(circles)}
       {''.join(labels)}
       <text x="36" y="36" class="map-caption">Mapa operacional aproximado da região de São Paulo com base em lat_grid/lon_grid</text>
@@ -241,23 +241,23 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
   <title>Dashboard SP Mobility KPI</title>
   <style>
     :root {
-      --bg: #091521;
-      --panel: #102233;
-      --panel-2: #12293d;
-      --line: #24435a;
-      --text: #f4f8fb;
-      --muted: #9bb0c2;
-      --teal: #19b7a8;
-      --mint: #7de0c5;
-      --amber: #e8c76a;
-      --orange: #f08c4a;
-      --danger: #ff7a6b;
+      --bg: #f3f7fb;
+      --panel: #ffffff;
+      --panel-2: #fbfdff;
+      --line: #d7e2eb;
+      --text: #173246;
+      --muted: #708799;
+      --teal: #159c92;
+      --mint: #53c6b2;
+      --amber: #d5af49;
+      --orange: #e27c3f;
+      --danger: #d96b5e;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #0a1723 0%, #0f2235 100%);
+      background: linear-gradient(180deg, #eef4f9 0%, #f8fbfd 100%);
       color: var(--text);
     }
     .wrap {
@@ -286,7 +286,7 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
     .tag {
       background: rgba(25,183,168,0.12);
       border: 1px solid rgba(125,224,197,0.35);
-      color: #bff6ea;
+      color: #255f59;
       padding: 10px 14px;
       border-radius: 14px;
       font-size: 14px;
@@ -305,7 +305,7 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 20px 22px;
-      box-shadow: 0 18px 36px rgba(0,0,0,0.18);
+      box-shadow: 0 14px 28px rgba(18, 41, 61, 0.08);
     }
     .kpi .label {
       color: var(--muted);
@@ -318,7 +318,7 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
       margin-bottom: 8px;
     }
     .kpi .sub {
-      color: #9fe6d5;
+      color: #2f857d;
       font-size: 14px;
       line-height: 1.4;
     }
@@ -333,12 +333,14 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
       line-height: 1.5;
     }
     .chart { width: 100%; height: auto; }
-    .axis { stroke: #3a576d; stroke-width: 1.5; }
-    .tick { fill: #89a2b8; font-size: 12px; }
+    .axis { stroke: #bfd0dc; stroke-width: 1.5; }
+    .tick { fill: #7f95a6; font-size: 12px; }
+    .map-label { fill: #183246; font-size: 11px; font-weight: 600; }
+    .map-caption { fill: #647d8f; font-size: 13px; }
     .insights {
       margin: 0;
       padding-left: 18px;
-      color: #d8e5ef;
+      color: #365065;
       line-height: 1.6;
     }
     .insights li { margin-bottom: 10px; }
@@ -350,14 +352,14 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
     }
     .table th, .table td {
       padding: 10px 12px;
-      border-bottom: 1px solid #223a4e;
+      border-bottom: 1px solid #e1e8ef;
       text-align: left;
     }
     .table th { color: var(--muted); font-weight: 600; }
     .note {
-      background: rgba(240,140,74,0.12);
-      border: 1px solid rgba(240,140,74,0.35);
-      color: #ffd7bb;
+      background: rgba(226,124,63,0.08);
+      border: 1px solid rgba(226,124,63,0.22);
+      color: #7a4c30;
       padding: 16px 18px;
       border-radius: 16px;
       line-height: 1.6;
@@ -369,9 +371,9 @@ def build_dashboard(csv_path: Path, heatmap_csv: Path, route_csv: Path, out_path
       border-radius: 999px;
       font-size: 12px;
       margin-right: 8px;
-      background: rgba(125,224,197,0.1);
-      border: 1px solid rgba(125,224,197,0.25);
-      color: #c9f4ea;
+      background: rgba(83,198,178,0.1);
+      border: 1px solid rgba(83,198,178,0.25);
+      color: #25675f;
     }
     .footer {
       margin-top: 18px;

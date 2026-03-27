@@ -288,13 +288,24 @@ Artefatos relacionados:
 - [25_gold_mobility_kpis.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/25_gold_mobility_kpis.py)
 - [22_gold_route_performance.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/22_gold_route_performance.py)
 - [24_gold_city_heatmap.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/notebooks/40_gold/24_gold_city_heatmap.py)
+- [sp_mobility_dashboard_ptbr.html](/Users/leandrosantos/Downloads/sp-mobility-data-platform/docs/assets/sp_mobility_dashboard_ptbr.html)
+- [sp_mobility_dashboard_mockup.svg](/Users/leandrosantos/Downloads/sp-mobility-data-platform/docs/assets/sp_mobility_dashboard_mockup.svg)
+- [generate_sp_mobility_dashboard.py](/Users/leandrosantos/Downloads/sp-mobility-data-platform/scripts/generate_sp_mobility_dashboard.py)
 
 Status atual da camada de consumo:
 
 - datasets Gold validados e consultáveis no cluster Databricks
 - queries analíticas organizadas em notebook dedicado
 - export dos datasets principais preparado para consumo em ferramenta de BI externa
-- dashboard operacional em construção com foco em KPIs, rotas e distribuição espacial
+- dashboard operacional em PT-BR gerado a partir dos exports analíticos do projeto
+- visão consolidada de KPIs, série temporal, ranking de linhas, hotspots e mapa operacional da região de São Paulo
+
+O dashboard atual foi construído a partir dos datasets exportados de `mobility_kpis`, `route_performance` e `city_heatmap`, com foco em:
+
+- volume operacional por snapshot
+- acessibilidade
+- concentração por linha
+- distribuição espacial por grid geográfico
 
 ## Governança
 
