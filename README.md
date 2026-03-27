@@ -289,7 +289,6 @@ Artefatos relacionados:
 - [22_gold_route_performance.py](notebooks/40_gold/22_gold_route_performance.py)
 - [24_gold_city_heatmap.py](notebooks/40_gold/24_gold_city_heatmap.py)
 - [sp_mobility_dashboard_ptbr.html](docs/assets/sp_mobility_dashboard_ptbr.html)
-- [sp_mobility_dashboard_mockup.svg](docs/assets/sp_mobility_dashboard_mockup.svg)
 - [generate_sp_mobility_dashboard.py](scripts/generate_sp_mobility_dashboard.py)
 
 Status atual da camada de consumo:
@@ -307,10 +306,6 @@ O dashboard atual foi construído a partir dos datasets exportados de `mobility_
 - concentração por linha
 - distribuição espacial por grid geográfico
 
-### Preview do dashboard
-
-![Preview do dashboard SP Mobility](docs/assets/sp_mobility_dashboard_mockup.svg)
-
 O artefato final em HTML reúne:
 
 - KPIs operacionais em português
@@ -323,6 +318,10 @@ Arquivos de apoio:
 
 - [Dashboard HTML](docs/assets/sp_mobility_dashboard_ptbr.html)
 - [Gerador do dashboard](scripts/generate_sp_mobility_dashboard.py)
+
+Observação:
+
+- o dashboard HTML foi incluído como artefato navegável do projeto; em alguns contextos do GitHub, o arquivo pode ser baixado ou exibido sem renderização completa no preview nativo
 
 ## Governança
 
@@ -383,12 +382,12 @@ Cobertura atual:
 - uso de GitHub Environments para `dev` e `prod`
 - suporte a `workflow_dispatch` para deploy manual por ambiente
 
-Próxima fase recomendada:
+Próxima fase opcional:
 
 - adicionar smoke tests pós-deploy no Databricks
 - separar job definitions por ambiente
-- consolidar o dashboard final em ferramenta de BI
-- adicionar screenshots finais ao `README`
+- publicar o dashboard em host estático ou GitHub Pages
+- adicionar screenshot final do dashboard ao `README`
 - revisar o About e os tópicos do repositório
 
 ## Como executar pela CLI
@@ -443,10 +442,10 @@ O problema foi mitigado ao substituir `job_cluster` efêmero pelo cluster existe
 
 ## Próximos passos
 
-Para fechar a primeira release do projeto com acabamento de portfólio, os próximos passos recomendados são:
+Para evoluções futuras do projeto, os próximos passos opcionais são:
 
-- consolidar o dashboard final em ferramenta de BI
-- adicionar screenshots finais ao `README`
+- publicar o dashboard em host estático ou GitHub Pages
+- adicionar screenshot final do dashboard ao `README`
 - revisar o About e os tópicos do repositório
 - adicionar smoke tests pós-deploy no Databricks
 - separar job definitions por ambiente
